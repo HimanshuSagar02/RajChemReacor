@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import logo from "../assets/logo.jpg"
 import { IoMdPerson } from "react-icons/io";
 import { GiHamburgerMenu, GiSplitCross } from "react-icons/gi";
+import { FaTachometerAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { serverUrl } from '../App';
 import axios from 'axios';
@@ -104,104 +105,17 @@ function Nav() {
         />
       </div>
 
-      {/* Profile Dropdown (Desktop) */}
-      {showPro && (
-        <div className='absolute top-[90px] right-4 lg:right-8 z-50 bg-white rounded-2xl shadow-2xl border-2 border-[#FFD700] p-4 min-w-[250px]'>
+      {/* Profile Dropdown (Desktop) - Only My Profile */}
+      {showPro && userData && (
+        <div className='absolute top-[90px] right-4 lg:right-8 z-50 bg-white rounded-2xl shadow-2xl border-2 border-[#FFD700] p-4 min-w-[200px]'>
           <div className='space-y-2'>
             <button
-              className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
+              className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold flex items-center gap-2'
               onClick={() => { navigate("/profile"); setShowPro(false); }}
             >
+              <IoMdPerson className='w-5 h-5' />
               My Profile
             </button>
-            <button
-              className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-              onClick={() => { navigate("/enrolledcourses"); setShowPro(false); }}
-            >
-              My Courses
-            </button>
-            {userData?.role === "student" && (
-              <button
-                className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                onClick={() => { navigate("/student-dashboard"); setShowPro(false); }}
-              >
-                Student Dashboard
-              </button>
-            )}
-            <button
-              className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-              onClick={() => { navigate("/doubts"); setShowPro(false); }}
-            >
-              Doubts & Questions
-            </button>
-            {userData?.role === "student" && (
-              <button
-                className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                onClick={() => { navigate("/feedback"); setShowPro(false); }}
-              >
-                Submit Feedback
-              </button>
-            )}
-            {(userData?.role === "educator" || userData?.role === "admin") && (
-              <button
-                className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                onClick={() => { navigate("/notifications"); setShowPro(false); }}
-              >
-                Notifications
-              </button>
-            )}
-            {userData?.role === "educator" && (
-              <>
-                <div className='border-t border-gray-200 my-2'></div>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/assignments"); setShowPro(false); }}
-                >
-                  Assignments
-                </button>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/my-students"); setShowPro(false); }}
-                >
-                  My Students
-                </button>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/attendance"); setShowPro(false); }}
-                >
-                  Attendance
-                </button>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/liveclasses"); setShowPro(false); }}
-                >
-                  Live Classes
-                </button>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/grades"); setShowPro(false); }}
-                >
-                  Grades
-                </button>
-              </>
-            )}
-            {userData?.role === "admin" && (
-              <>
-                <div className='border-t border-gray-200 my-2'></div>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/admin/users"); setShowPro(false); }}
-                >
-                  Admin Panel
-                </button>
-                <button
-                  className='w-full text-left px-4 py-3 bg-black text-[#FFD700] rounded-xl hover:bg-[#FFD700] hover:text-black transition-all font-semibold'
-                  onClick={() => { navigate("/admin/feedback"); setShowPro(false); }}
-                >
-                  View Feedback
-                </button>
-              </>
-            )}
           </div>
         </div>
       )}
@@ -226,97 +140,14 @@ function Nav() {
         )}
 
         <div className='flex flex-col gap-4 w-full max-w-sm px-8'>
-          <button
-            className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-            onClick={() => { navigate("/profile"); setShowHam(false); }}
-          >
-            My Profile
-          </button>
-          <button
-            className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-            onClick={() => { navigate("/enrolledcourses"); setShowHam(false); }}
-          >
-            My Courses
-          </button>
-          {userData?.role === "student" && (
+          {userData && (
             <button
-              className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-              onClick={() => { navigate("/student-dashboard"); setShowHam(false); }}
+              className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2'
+              onClick={() => { navigate("/profile"); setShowHam(false); }}
             >
-              Student Dashboard
+              <IoMdPerson className='w-5 h-5' />
+              My Profile
             </button>
-          )}
-          <button
-            className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-            onClick={() => { navigate("/doubts"); setShowHam(false); }}
-          >
-            Doubts & Questions
-          </button>
-          {(userData?.role === "educator" || userData?.role === "admin") && (
-            <button
-              className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-              onClick={() => { navigate("/notifications"); setShowHam(false); }}
-            >
-              Notifications
-            </button>
-          )}
-          {userData?.role === "educator" && (
-            <>
-              <div className='border-t border-[#FFD700] my-2'></div>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/dashboard"); setShowHam(false); }}
-              >
-                Educator Dashboard
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/assignments"); setShowHam(false); }}
-              >
-                Assignments
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/my-students"); setShowHam(false); }}
-              >
-                My Students
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/attendance"); setShowHam(false); }}
-              >
-                Attendance
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/liveclasses"); setShowHam(false); }}
-              >
-                Live Classes
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/grades"); setShowHam(false); }}
-              >
-                Grades
-              </button>
-            </>
-          )}
-          {userData?.role === "admin" && (
-            <>
-              <div className='border-t border-[#FFD700] my-2'></div>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/admin/users"); setShowHam(false); }}
-              >
-                Admin Panel
-              </button>
-              <button
-                className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-                onClick={() => { navigate("/admin/feedback"); setShowHam(false); }}
-              >
-                View Feedback
-              </button>
-            </>
           )}
           {!userData ? (
             <button

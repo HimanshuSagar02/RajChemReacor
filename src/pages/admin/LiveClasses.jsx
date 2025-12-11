@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { FaVideo, FaCalendarAlt, FaClock, FaUsers, FaEdit, FaTrash, FaPlay, FaStop } from "react-icons/fa";
 import LiveVideoPlayer from "../../components/LiveVideoPlayer";
+import LiveKitPlayer from "../../components/LiveKitPlayer";
 
 function LiveClasses() {
   const { userData } = useSelector((state) => state.user);
@@ -16,6 +17,7 @@ function LiveClasses() {
   const [editingClass, setEditingClass] = useState(null);
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [currentLiveClassId, setCurrentLiveClassId] = useState(null);
+  const [currentPlatformType, setCurrentPlatformType] = useState("portal");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -278,6 +280,7 @@ function LiveClasses() {
                           onClick={async () => {
                             await handleStatusChange(liveClass._id, "live");
                             setCurrentLiveClassId(liveClass._id);
+                            setCurrentPlatformType("portal");
                             setShowVideoPlayer(true);
                           }}
                           className="flex-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2 text-sm"
@@ -303,6 +306,7 @@ function LiveClasses() {
                           <button
                             onClick={() => {
                               setCurrentLiveClassId(liveClass._id);
+                              setCurrentPlatformType("portal");
                               setShowVideoPlayer(true);
                             }}
                             className="flex-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 flex items-center justify-center gap-2 text-sm"
@@ -607,15 +611,27 @@ function LiveClasses() {
 
       {/* Live Video Player */}
       {showVideoPlayer && currentLiveClassId && (
-        <LiveVideoPlayer
-          liveClassId={currentLiveClassId}
-          userRole={userData?.role}
-          isEducator={true}
-          onClose={() => {
-            setShowVideoPlayer(false);
-            setCurrentLiveClassId(null);
-          }}
-        />
+        currentPlatformType === "portal" ? (
+          <LiveKitPlayer
+            liveClassId={currentLiveClassId}
+            userRole={userData?.role}
+            isEducator={true}
+            onClose={() => {
+              setShowVideoPlayer(false);
+              setCurrentLiveClassId(null);
+            }}
+          />
+        ) : (
+          <LiveVideoPlayer
+            liveClassId={currentLiveClassId}
+            userRole={userData?.role}
+            isEducator={true}
+            onClose={() => {
+              setShowVideoPlayer(false);
+              setCurrentLiveClassId(null);
+            }}
+          />
+        )
       )}
     </div>
   );

@@ -13,21 +13,30 @@ function EditLecture() {
     const {courseId , lectureId} = useParams()
     const {lectureData} = useSelector(state=>state.lecture)
     const dispatch = useDispatch()
-    const selectedLecture = lectureData.find(lecture => lecture._id === lectureId)
+    const selectedLecture = lectureData?.find(lecture => lecture._id === lectureId)
     const [videoUrl,setVideoUrl] = useState(null)
-    const [lectureTitle,setLectureTitle] = useState(selectedLecture.lectureTitle)
-    const [isPreviewFree,setIsPreviewFree] = useState(false)
-
-    const formData = new FormData()
-    formData.append("lectureTitle",lectureTitle)
-    formData.append("videoUrl",videoUrl)
-    formData.append("isPreviewFree",isPreviewFree)
-    
+    const [lectureTitle,setLectureTitle] = useState(selectedLecture?.lectureTitle || "")
+    const [isPreviewFree,setIsPreviewFree] = useState(selectedLecture?.isPreviewFree || false)
 
     const editLecture = async () => {
+      if (!videoUrl && !lectureTitle) {
+        toast.error("Please provide at least a video or title to update");
+        return;
+      }
+      
       setLoading(true)
+      const formData = new FormData()
+      if (lectureTitle) formData.append("lectureTitle", lectureTitle)
+      if (videoUrl) formData.append("videoUrl", videoUrl)
+      formData.append("isPreviewFree", isPreviewFree)
+      
       try {
-        const result = await axios.post(serverUrl + `/api/course/editlecture/${lectureId}` , formData , {withCredentials:true})
+        const result = await axios.post(serverUrl + `/api/course/editlecture/${lectureId}` , formData , {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         console.log(result.data)
         dispatch(setLectureData([...lectureData,result.data]))
         toast.success("Lecture Updated")
@@ -91,7 +100,7 @@ function EditLecture() {
             <input
               type="text"
               className="w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[black]focus:outline-none"
-              placeholder={selectedLecture.lectureTitle}
+              placeholder={selectedLecture?.lectureTitle || "Enter lecture title"}
               onChange={(e)=>setLectureTitle(e.target.value)}
               value={lectureTitle}
             />

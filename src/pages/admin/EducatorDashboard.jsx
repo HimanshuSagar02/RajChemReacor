@@ -12,7 +12,8 @@ import {
   FaBell, 
   FaVideo, 
   FaGraduationCap,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaTachometerAlt
 } from "react-icons/fa";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
@@ -163,6 +164,13 @@ function EducatorDashboard() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
+              <FaTachometerAlt 
+                className={`w-5 h-5 transition-all ${activeTab === "overview" ? "text-[#FFD700]" : "text-[#FFEB3B]"}`} 
+                style={{ 
+                  filter: activeTab !== "overview" ? "drop-shadow(0 2px 4px rgba(255, 235, 59, 0.4))" : "drop-shadow(0 2px 4px rgba(255, 215, 0, 0.6))",
+                  opacity: activeTab === "overview" ? 1 : 0.85
+                }} 
+              />
               Overview
             </button>
             <button
@@ -256,67 +264,121 @@ function EducatorDashboard() {
               
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-105">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
-                      <FaBook className="text-[#FFD700] text-2xl" />
+                <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <FaBook className="text-white text-2xl" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">My Courses</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Total Programs</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-semibold">Total Courses</p>
                   </div>
-                  <p className="text-3xl font-bold text-black">{(creatorCourseData || []).length}</p>
+                  <div className="relative z-10">
+                    <p className="text-4xl font-black text-black mb-1 tracking-tight">{(creatorCourseData || []).length}</p>
+                    <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">Active Courses</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-black hover:shadow-xl transition-all hover:scale-105">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-black bg-opacity-10 rounded-lg flex items-center justify-center">
-                      <FaUsers className="text-black text-2xl" />
+                <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <FaUsers className="text-white text-2xl" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Students</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Total Enrolled</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-semibold">Total Students</p>
                   </div>
-                  <p className="text-3xl font-bold text-black">
-                    {(creatorCourseData || []).reduce((sum, course) => 
-                      sum + ((course.enrolledStudents || []).length), 0)}
-                  </p>
+                  <div className="relative z-10">
+                    <p className="text-4xl font-black text-black mb-1 tracking-tight">
+                      {(creatorCourseData || []).reduce((sum, course) => 
+                        sum + ((course.enrolledStudents || []).length), 0)}
+                    </p>
+                    <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Active Learners</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-105">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
-                      <span className="text-[#FFD700] text-2xl font-bold">₹</span>
+                <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <span className="text-white text-2xl font-bold">₹</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Revenue</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Total Earnings</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-semibold">Total Earnings</p>
                   </div>
-                  <p className="text-3xl font-bold text-black">₹{totalEarnings.toLocaleString()}</p>
+                  <div className="relative z-10">
+                    <p className="text-4xl font-black text-black mb-1 tracking-tight">₹{totalEarnings.toLocaleString()}</p>
+                    <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">Total Income</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-black hover:shadow-xl transition-all hover:scale-105">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-black bg-opacity-10 rounded-lg flex items-center justify-center">
-                      <FaBook className="text-black text-2xl" />
+                <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <FaBook className="text-white text-2xl" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Lectures</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Total Content</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-semibold">Total Lectures</p>
                   </div>
-                  <p className="text-3xl font-bold text-black">
-                    {(creatorCourseData || []).reduce((sum, course) => 
-                      sum + ((course.lectures || []).length), 0)}
-                  </p>
+                  <div className="relative z-10">
+                    <p className="text-4xl font-black text-black mb-1 tracking-tight">
+                      {(creatorCourseData || []).reduce((sum, course) => 
+                        sum + ((course.lectures || []).length), 0)}
+                    </p>
+                    <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Video Lessons</p>
+                  </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-105">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
-                      <FaQuestionCircle className="text-[#FFD700] text-2xl" />
+                <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <FaQuestionCircle className="text-white text-2xl" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Doubts</p>
+                        <p className="text-xs font-medium text-gray-500 mt-0.5">Pending Questions</p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 font-semibold">Pending Doubts</p>
                   </div>
-                  <p className="text-3xl font-bold text-black">{pendingDoubtsCount}</p>
-                  {pendingDoubtsCount > 0 && (
-                    <button
-                      onClick={() => {
-                        setActiveTab("doubts");
-                        navigate("/doubts");
-                      }}
-                      className="mt-3 text-xs bg-black text-[#FFD700] px-3 py-1 rounded-lg hover:bg-gray-900 font-semibold transition-all"
-                    >
-                      View Doubts →
-                    </button>
-                  )}
+                  <div className="relative z-10">
+                    <p className="text-4xl font-black text-black mb-1 tracking-tight">{pendingDoubtsCount}</p>
+                    {pendingDoubtsCount > 0 ? (
+                      <>
+                        <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">Awaiting Response</p>
+                        <button
+                          onClick={() => {
+                            setActiveTab("doubts");
+                            navigate("/doubts");
+                          }}
+                          className="mt-3 text-xs bg-black text-[#FFD700] px-4 py-2 rounded-lg hover:bg-gray-900 font-bold transition-all shadow-md"
+                        >
+                          View Doubts →
+                        </button>
+                      </>
+                    ) : (
+                      <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">All Resolved</p>
+                    )}
+                  </div>
                 </div>
               </div>
 

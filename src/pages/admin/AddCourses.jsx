@@ -77,7 +77,9 @@ const editCourseHandler = async () => {
   formData.append("category", category);
   formData.append("level", level);
   formData.append("price", price);
-  formData.append("thumbnail", backendImage);
+  if (backendImage) {
+    formData.append("thumbnail", backendImage);
+  }
   formData.append("isPublished", isPublished);
 
   try {

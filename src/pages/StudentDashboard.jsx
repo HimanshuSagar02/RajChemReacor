@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { serverUrl } from "../App";
 import LiveVideoPlayer from "../components/LiveVideoPlayer";
+import LiveKitPlayer from "../components/LiveKitPlayer";
 import { FaBook, FaClipboardList, FaBell, FaGraduationCap, FaUser, FaEnvelope, FaClock, FaCalendarCheck, FaVideo } from "react-icons/fa";
 
 function StudentDashboard() {
@@ -53,6 +54,7 @@ function StudentDashboard() {
   // Video Player
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [currentLiveClassId, setCurrentLiveClassId] = useState(null);
+  const [currentPlatformType, setCurrentPlatformType] = useState("portal");
 
   const enrolledCourses = useMemo(() => {
     const ids = (userData?.enrolledCourses || []).map((c) =>
@@ -362,54 +364,90 @@ function StudentDashboard() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-105">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
-                <FaBook className="text-[#FFD700] text-2xl" />
+          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+            {/* Decorative background element */}
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+            
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaBook className="text-white text-2xl" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">My Courses</p>
+                  <p className="text-xs font-medium text-gray-500 mt-0.5">Enrolled Programs</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 font-semibold">Enrolled Courses</p>
             </div>
-            <p className="text-3xl font-bold text-black">{totalEnrolledCourses}</p>
-            <p className="text-xs text-gray-500 mt-2">Active courses</p>
+            <div className="relative z-10">
+              <p className="text-4xl font-black text-black mb-1 tracking-tight">{totalEnrolledCourses}</p>
+              <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">Active Learning</p>
+            </div>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-black hover:shadow-xl transition-all hover:scale-105">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-black bg-opacity-10 rounded-lg flex items-center justify-center">
-                <FaClipboardList className="text-black text-2xl" />
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+            
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaClipboardList className="text-white text-2xl" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">My Tasks</p>
+                  <p className="text-xs font-medium text-gray-500 mt-0.5">Assignments</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 font-semibold">Assignments</p>
             </div>
-            <p className="text-3xl font-bold text-black">
-              {completedAssignments}/{totalAssignments}
-            </p>
-            <p className="text-xs text-gray-500 mt-2">Completed</p>
+            <div className="relative z-10">
+              <p className="text-4xl font-black text-black mb-1 tracking-tight">
+                {completedAssignments}/{totalAssignments}
+              </p>
+              <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Completed Tasks</p>
+            </div>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#FFD700] hover:shadow-xl transition-all hover:scale-105">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
-                <FaBell className="text-[#FFD700] text-2xl" />
+          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+            
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaBell className="text-white text-2xl" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Alerts</p>
+                  <p className="text-xs font-medium text-gray-500 mt-0.5">Notifications</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 font-semibold">Notifications</p>
             </div>
-            <p className="text-3xl font-bold text-black">{totalNotifications}</p>
-            {unreadNotifications > 0 && (
-              <p className="text-xs text-red-600 mt-2 font-semibold">{unreadNotifications} unread</p>
-            )}
-            {unreadNotifications === 0 && (
-              <p className="text-xs text-gray-500 mt-2">All read</p>
-            )}
+            <div className="relative z-10">
+              <p className="text-4xl font-black text-black mb-1 tracking-tight">{totalNotifications}</p>
+              {unreadNotifications > 0 ? (
+                <p className="text-xs font-bold text-red-600 uppercase tracking-wider mt-2">{unreadNotifications} Unread</p>
+              ) : (
+                <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">All Read</p>
+              )}
+            </div>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-black hover:shadow-xl transition-all hover:scale-105">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-black bg-opacity-10 rounded-lg flex items-center justify-center">
-                <FaGraduationCap className="text-black text-2xl" />
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+            
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaGraduationCap className="text-white text-2xl" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Performance</p>
+                  <p className="text-xs font-medium text-gray-500 mt-0.5">Average Grade</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 font-semibold">Average Grade</p>
             </div>
-            <p className="text-3xl font-bold text-black">
-              {averageGrade !== null ? `${averageGrade}%` : "N/A"}
-            </p>
-            <p className="text-xs text-gray-500 mt-2">Overall performance</p>
+            <div className="relative z-10">
+              <p className="text-4xl font-black text-black mb-1 tracking-tight">
+                {averageGrade !== null ? `${averageGrade}%` : "N/A"}
+              </p>
+              <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Overall Score</p>
+            </div>
           </div>
         </div>
 
@@ -1027,6 +1065,7 @@ function StudentDashboard() {
                       
                       // Open video player
                       setCurrentLiveClassId(liveClass._id);
+                      setCurrentPlatformType("portal");
                       setShowVideoPlayer(true);
                       fetchLiveClasses();
                     } else {
@@ -1353,15 +1392,27 @@ function StudentDashboard() {
 
       {/* Live Video Player */}
       {showVideoPlayer && currentLiveClassId && (
-        <LiveVideoPlayer
-          liveClassId={currentLiveClassId}
-          userRole={userData?.role}
-          isEducator={false}
-          onClose={() => {
-            setShowVideoPlayer(false);
-            setCurrentLiveClassId(null);
-          }}
-        />
+        currentPlatformType === "portal" ? (
+          <LiveKitPlayer
+            liveClassId={currentLiveClassId}
+            userRole={userData?.role}
+            isEducator={false}
+            onClose={() => {
+              setShowVideoPlayer(false);
+              setCurrentLiveClassId(null);
+            }}
+          />
+        ) : (
+          <LiveVideoPlayer
+            liveClassId={currentLiveClassId}
+            userRole={userData?.role}
+            isEducator={false}
+            onClose={() => {
+              setShowVideoPlayer(false);
+              setCurrentLiveClassId(null);
+            }}
+          />
+        )
       )}
     </div>
   );
