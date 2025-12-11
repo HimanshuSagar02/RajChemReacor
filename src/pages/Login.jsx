@@ -34,7 +34,7 @@ function Login() {
 
         setLoading(true)
         try {
-            const result = await axios.post(serverUrl + "/api/auth/login", {email, password}, {withCredentials: true})
+            const result = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/login`, {email, password}, {withCredentials: true})
             dispatch(setUserData(result.data))
             navigate("/")
             setLoading(false)
