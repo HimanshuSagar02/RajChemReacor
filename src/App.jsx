@@ -35,7 +35,8 @@ import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/admin/AdminFeedback'
 import AIAssistant from './components/AIAssistant'
 
-export const serverUrl = "http://localhost:8000"
+// Use environment variable for server URL, fallback to localhost for development
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
 
 function App() {
   
