@@ -69,9 +69,11 @@ function StudentDashboard() {
       const res = await axios.get(`${serverUrl}/api/notifications/my`, {
         withCredentials: true,
       });
-      setNotifications(res.data || []);
+      setNotifications(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
+      console.error("Failed to fetch notifications:", error);
       toast.error("Failed to fetch notifications");
+      setNotifications([]);
     } finally {
       setLoadingNotifications(false);
     }
@@ -89,17 +91,30 @@ function StudentDashboard() {
   };
 
   const fetchAssignments = async () => {
-    if (!enrolledCourses.length) return;
+    if (!enrolledCourses || !enrolledCourses.length) {
+      setAssignments([]);
+      return;
+    }
     setLoadingAssignments(true);
     try {
       const requests = enrolledCourses.map((c) =>
         axios.get(`${serverUrl}/api/assignments/${c._id}`, { withCredentials: true })
+          .catch((err) => {
+            console.error(`Failed to fetch assignments for course ${c._id}:`, err);
+            return { data: [] }; // Return empty array on error
+          })
       );
       const results = await Promise.all(requests);
       const list = [];
       results.forEach((res, idx) => {
         const course = enrolledCourses[idx];
-        (res.data || []).forEach((a) => list.push({ ...a, course }));
+        if (course && res && res.data && Array.isArray(res.data)) {
+          res.data.forEach((a) => {
+            if (a && a._id) {
+              list.push({ ...a, course });
+            }
+          });
+        }
       });
       setAssignments(list);
 
@@ -114,7 +129,9 @@ function StudentDashboard() {
       );
       setSubmissions(Object.fromEntries(submissionPairs));
     } catch (error) {
+      console.error("Failed to fetch assignments:", error);
       toast.error("Failed to fetch assignments");
+      setAssignments([]);
     } finally {
       setLoadingAssignments(false);
     }
@@ -143,9 +160,11 @@ function StudentDashboard() {
         params,
         withCredentials: true,
       });
-      setSharedNotes(res.data || []);
+      setSharedNotes(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
+      console.error("Failed to fetch shared notes:", error);
       toast.error("Failed to fetch shared notes");
+      setSharedNotes([]);
     }
   };
 
@@ -154,19 +173,20 @@ function StudentDashboard() {
       const res = await axios.get(`${serverUrl}/api/attendance/my`, {
         withCredentials: true,
       });
-      const attendanceData = res.data || [];
+      const attendanceData = Array.isArray(res.data) ? res.data : [];
       // Populate course information using Redux courseData if available, otherwise fetch from API
       const attendanceWithCourses = await Promise.all(
         attendanceData.map(async (a) => {
+          if (!a) return null;
           if (a.courseId && typeof a.courseId === 'string') {
             // First try to find course in Redux store
-            const courseFromStore = courseData?.find(c => c._id === a.courseId);
+            const courseFromStore = courseData?.find(c => c && c._id === a.courseId);
             if (courseFromStore) {
               return { ...a, courseId: courseFromStore };
             }
             // If not in store, fetch from API
             try {
-              const courseRes = await axios.get(`${serverUrl}/api/course/${a.courseId}`, {
+              const courseRes = await axios.get(`${serverUrl}/api/course/getcourse/${a.courseId}`, {
                 withCredentials: true,
               });
               return { ...a, courseId: courseRes.data };
@@ -177,10 +197,11 @@ function StudentDashboard() {
           return a;
         })
       );
-      setAttendance(attendanceWithCourses);
+      setAttendance(attendanceWithCourses.filter(a => a !== null));
     } catch (error) {
       console.error("Failed to fetch attendance:", error);
       toast.error("Failed to fetch attendance records");
+      setAttendance([]);
     }
   };
 
@@ -200,9 +221,11 @@ function StudentDashboard() {
       const res = await axios.get(`${serverUrl}/api/liveclass/my`, {
         withCredentials: true,
       });
-      setLiveClasses(res.data || []);
+      setLiveClasses(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
+      console.error("Failed to fetch live classes:", error);
       toast.error("Failed to fetch live classes");
+      setLiveClasses([]);
     } finally {
       setLoadingLiveClasses(false);
     }
@@ -287,14 +310,21 @@ function StudentDashboard() {
   // Calculate statistics
   const totalEnrolledCourses = enrolledCourses.length;
   const totalAssignments = assignments.length;
-  const completedAssignments = Object.values(submissions).filter(s => s?.status === "submitted" || s?.status === "graded").length;
-  const totalNotifications = notifications.length;
-  const unreadNotifications = notifications.filter(n => !n.isRead).length;
-  const totalLiveClasses = liveClasses.length;
-  const upcomingLiveClasses = liveClasses.filter(lc => {
-    const scheduledDate = new Date(lc.scheduledDate);
-    return scheduledDate > new Date() && lc.status === "scheduled";
-  }).length;
+  const completedAssignments = submissions && typeof submissions === 'object' 
+    ? Object.values(submissions).filter(s => s && (s?.status === "submitted" || s?.status === "graded")).length 
+    : 0;
+  const totalNotifications = notifications && Array.isArray(notifications) ? notifications.length : 0;
+  const unreadNotifications = notifications && Array.isArray(notifications) 
+    ? notifications.filter(n => n && !n.isRead).length 
+    : 0;
+  const totalLiveClasses = liveClasses && Array.isArray(liveClasses) ? liveClasses.length : 0;
+  const upcomingLiveClasses = liveClasses && Array.isArray(liveClasses)
+    ? liveClasses.filter(lc => {
+        if (!lc || !lc.scheduledDate) return false;
+        const scheduledDate = new Date(lc.scheduledDate);
+        return scheduledDate > new Date() && lc.status === "scheduled";
+      }).length
+    : 0;
 
   // Calculate average grade if grades exist
   const averageGrade = grades.length > 0
@@ -548,7 +578,9 @@ function StudentDashboard() {
               </div>
             )}
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
-              {notifications.map((notif) => (
+              {notifications && Array.isArray(notifications) && notifications.map((notif) => {
+                if (!notif || !notif._id) return null;
+                return (
                 <div
                   key={notif._id}
                   className={`border rounded-lg p-4 shadow-sm transition-all ${
@@ -602,7 +634,8 @@ function StudentDashboard() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
           )}
@@ -629,7 +662,8 @@ function StudentDashboard() {
               </div>
             )}
             <div className="grid md:grid-cols-2 gap-4">
-              {assignments.map((a) => {
+              {assignments && Array.isArray(assignments) && assignments.map((a) => {
+                if (!a || !a._id) return null;
                 const sub = submissions[a._id];
                 const payload = submitForm[a._id] || {};
                 return (
@@ -796,8 +830,10 @@ function StudentDashboard() {
                 <div className="space-y-3">
                   <h2 className="text-lg font-semibold">Shared Notes</h2>
                   <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-                    {sharedNotes.length === 0 && <p className="text-gray-500">No shared notes.</p>}
-                    {sharedNotes.map((n) => (
+                    {(!sharedNotes || sharedNotes.length === 0) && <p className="text-gray-500">No shared notes.</p>}
+                    {sharedNotes && Array.isArray(sharedNotes) && sharedNotes.map((n) => {
+                      if (!n || !n._id) return null;
+                      return (
                       <div key={n._id} className="border rounded-lg p-3 shadow-sm">
                         <p className="text-xs text-gray-500">
                           {formatDate(n.createdAt)} • {n.uploaderId?.name || "User"}
@@ -817,7 +853,8 @@ function StudentDashboard() {
                           </a>
                         )}
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
                 </div>
               </div>
@@ -828,10 +865,12 @@ function StudentDashboard() {
                   Download notes uploaded by your course educators. Only educators can upload notes.
                 </p>
                 <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
-                  {sharedNotes.length === 0 && (
+                  {(!sharedNotes || sharedNotes.length === 0) && (
                     <p className="text-gray-500 text-center py-8">No shared notes available for your enrolled courses.</p>
                   )}
-                  {sharedNotes.map((n) => (
+                  {sharedNotes && Array.isArray(sharedNotes) && sharedNotes.map((n) => {
+                    if (!n || !n._id) return null;
+                    return (
                     <div key={n._id} className="border rounded-lg p-4 shadow-sm bg-white">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -862,7 +901,8 @@ function StudentDashboard() {
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
