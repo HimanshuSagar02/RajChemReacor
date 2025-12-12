@@ -34,15 +34,42 @@ function Login() {
 
         setLoading(true)
         try {
-            const result = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {email, password}, {withCredentials: true})
-            dispatch(setUserData(result.data))
-            navigate("/")
+            // Use serverUrl from App.jsx (which uses VITE_SERVER_URL or defaults to localhost)
+            const result = await axios.post(`${serverUrl}/api/auth/login`, {email, password}, {withCredentials: true})
+            
+            if (result.data && result.data._id) {
+                dispatch(setUserData(result.data))
+                navigate("/")
+                toast.success("Login Successfully")
+            } else {
+                throw new Error("Invalid response from server")
+            }
             setLoading(false)
-            toast.success("Login Successfully")
         } catch (error) {
-            console.log(error)
+            console.error("Login error:", error)
             setLoading(false)
-            toast.error(error.response?.data?.message || "Login failed")
+            
+            // Better error handling
+            if (error.response) {
+                // Server responded with error
+                const errorMessage = error.response.data?.message || "Login failed"
+                toast.error(errorMessage)
+                
+                // Log detailed error for debugging
+                console.error("Login error details:", {
+                    status: error.response.status,
+                    message: errorMessage,
+                    data: error.response.data
+                })
+            } else if (error.request) {
+                // Request made but no response
+                console.error("No response from server:", error.request)
+                toast.error("Cannot connect to server. Please check your internet connection.")
+            } else {
+                // Error setting up request
+                console.error("Error setting up request:", error.message)
+                toast.error("Login failed. Please try again.")
+            }
         }
     }
 
