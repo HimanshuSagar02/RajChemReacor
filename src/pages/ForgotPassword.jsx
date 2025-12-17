@@ -15,63 +15,91 @@ function ForgotPassword() {
     const [conPassword,setConpassword]= useState("")
 
    const handleStep1 = async () => {
+    if (!email.trim()) {
+      toast.error("Please enter your email address");
+      return;
+    }
+    
     setLoading(true)
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/sendotp` , {email} , {withCredentials:true})
-      console.log(result)
+      console.log("[ForgotPassword] Sending OTP to:", email);
+      const result = await axios.post(`${serverUrl}/api/auth/sendotp`, {email}, {withCredentials: true})
+      console.log("[ForgotPassword] OTP response:", result.data);
+      
+      // Check if OTP is in response (development mode)
+      if (result.data.otp) {
+        console.log(`[ForgotPassword] Development mode - OTP received: ${result.data.otp}`);
+        toast.success(`OTP: ${result.data.otp} (Development mode - check console)`, {
+          autoClose: 10000
+        });
+      } else {
+        toast.success(result.data.message || "OTP sent successfully to your email");
+      }
+      
       setStep(2)
-      toast.success(result.data.message)
       setLoading(false)
       
     } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
+      console.error("[ForgotPassword] Error sending OTP:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to send OTP. Please try again.";
+      toast.error(errorMessage);
       setLoading(false)
     }
     
    }
     const handleStep2 = async () => {
+    if (!otp || otp.length !== 4) {
+      toast.error("Please enter a valid 4-digit OTP");
+      return;
+    }
+    
     setLoading(true)
     try {
-      const result = await axios.post(`${serverUrl}/api/auth/verifyotp` , {email,otp} , {withCredentials:true})
-      console.log(result)
+      console.log("[ForgotPassword] Verifying OTP for:", email);
+      const result = await axios.post(`${serverUrl}/api/auth/verifyotp`, {email, otp}, {withCredentials: true})
+      console.log("[ForgotPassword] OTP verified successfully:", result.data);
       
-      toast.success(result.data.message)
+      toast.success(result.data.message || "OTP verified successfully")
       setLoading(false)
       setStep(3)
     } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
+      console.error("[ForgotPassword] Error verifying OTP:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Invalid OTP. Please try again.";
+      toast.error(errorMessage);
       setLoading(false)
     }
     
    }
     const handleStep3 = async () => {
+    if(!newpassword || !conPassword){
+      toast.error("Please enter both password fields")
+      return
+    }
+    if(newpassword.length < 6){
+      toast.error("Password must be at least 6 characters")
+      return
+    }
+    if(newpassword !== conPassword){
+      toast.error("Passwords do not match")
+      return
+    }
+    
     setLoading(true)
     try {
-      if(!newpassword || !conPassword){
-        toast.error("Please enter both password fields")
-        setLoading(false)
-        return
-      }
-      if(newpassword.length < 8){
-        toast.error("Password must be at least 8 characters")
-        setLoading(false)
-        return
-      }
-      if(newpassword !== conPassword){
-        toast.error("Passwords do not match")
-        setLoading(false)
-        return
-      }
-      const result = await axios.post(`${serverUrl}/api/auth/resetpassword` , {email,password:newpassword} , {withCredentials:true})
-      console.log(result)
-      toast.success(result.data.message)
+      console.log("[ForgotPassword] Resetting password for:", email);
+      const result = await axios.post(`${serverUrl}/api/auth/resetpassword`, {email, password: newpassword}, {withCredentials: true})
+      console.log("[ForgotPassword] Password reset successfully:", result.data);
+      toast.success(result.data.message || "Password reset successfully")
       setLoading(false)
-      navigate("/login")
+      
+      // Small delay before navigation
+      setTimeout(() => {
+        navigate("/login")
+      }, 1000);
     } catch (error) {
-      console.log(error)
-      toast.error(error?.response?.data?.message || "Failed to reset password")
+      console.error("[ForgotPassword] Error resetting password:", error);
+      const errorMessage = error?.response?.data?.message || error.message || "Failed to reset password. Please try again.";
+      toast.error(errorMessage);
       setLoading(false)
     }
     

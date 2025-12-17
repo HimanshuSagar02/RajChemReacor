@@ -18,6 +18,9 @@ function LiveClasses() {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [currentLiveClassId, setCurrentLiveClassId] = useState(null);
   const [currentPlatformType, setCurrentPlatformType] = useState("portal");
+  const [showAllStudents, setShowAllStudents] = useState(false);
+  const [allStudents, setAllStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -26,6 +29,7 @@ function LiveClasses() {
     meetingLink: "",
     meetingId: "",
     meetingPassword: "",
+    scheduleType: "scheduled", // "scheduled" or "startnow"
     scheduledDate: "",
     duration: 60,
     maxParticipants: 100,
@@ -34,12 +38,17 @@ function LiveClasses() {
   const fetchLiveClasses = async () => {
     setLoading(true);
     try {
+      console.log("[LiveClasses] Fetching live classes for educator...");
       const res = await axios.get(`${serverUrl}/api/liveclass/educator`, {
         withCredentials: true,
       });
-      setLiveClasses(res.data || []);
+      console.log("[LiveClasses] Live classes fetched:", res.data?.length || 0);
+      setLiveClasses(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      toast.error("Failed to fetch live classes");
+      console.error("[LiveClasses] Error fetching live classes:", error);
+      const errorMessage = error.response?.data?.message || "Failed to fetch live classes";
+      toast.error(errorMessage);
+      setLiveClasses([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -49,21 +58,74 @@ function LiveClasses() {
     fetchLiveClasses();
   }, []);
 
+  const fetchAllStudents = async () => {
+    setLoadingStudents(true);
+    try {
+      const res = await axios.get(`${serverUrl}/api/user/allstudents`, {
+        withCredentials: true,
+      });
+      setAllStudents(res.data || []);
+    } catch (error) {
+      toast.error("Failed to fetch all students");
+      console.error("Error fetching all students:", error);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Prepare data for submission
+      const submitData = { ...formData };
+      
+      // If "Start Now" is selected, set scheduledDate to current time
+      if (submitData.scheduleType === "startnow") {
+        submitData.scheduledDate = new Date().toISOString();
+      }
+      
+      // Remove scheduleType from submission (not needed in backend)
+      delete submitData.scheduleType;
+      
       if (editingClass) {
         await axios.patch(
           `${serverUrl}/api/liveclass/${editingClass._id}`,
-          formData,
+          submitData,
           { withCredentials: true }
         );
         toast.success("Live class updated successfully");
+        
+        // If "Start Now" was selected, automatically start the class
+        if (formData.scheduleType === "startnow") {
+          await handleStatusChange(editingClass._id, "live");
+          if (formData.platformType === "portal") {
+            setCurrentLiveClassId(editingClass._id);
+            setCurrentPlatformType("portal");
+            setShowVideoPlayer(true);
+          } else if (submitData.meetingLink) {
+            window.open(submitData.meetingLink, '_blank');
+          }
+        }
       } else {
-        await axios.post(`${serverUrl}/api/liveclass`, formData, {
+        console.log("[LiveClasses] Creating new live class...", submitData);
+        const response = await axios.post(`${serverUrl}/api/liveclass`, submitData, {
           withCredentials: true,
         });
+        console.log("[LiveClasses] Live class created:", response.data);
         toast.success("Live class created successfully");
+        
+        // If "Start Now" was selected, automatically start the class
+        if (formData.scheduleType === "startnow") {
+          const newLiveClassId = response.data._id;
+          await handleStatusChange(newLiveClassId, "live");
+          if (formData.platformType === "portal") {
+            setCurrentLiveClassId(newLiveClassId);
+            setCurrentPlatformType("portal");
+            setShowVideoPlayer(true);
+          } else if (submitData.meetingLink) {
+            window.open(submitData.meetingLink, '_blank');
+          }
+        }
       }
       setShowModal(false);
       setEditingClass(null);
@@ -76,6 +138,9 @@ function LiveClasses() {
 
   const handleEdit = (liveClass) => {
     setEditingClass(liveClass);
+    const scheduledDate = new Date(liveClass.scheduledDate);
+    const isPastOrNow = scheduledDate <= new Date();
+    
     setFormData({
       title: liveClass.title,
       description: liveClass.description || "",
@@ -84,7 +149,8 @@ function LiveClasses() {
       meetingLink: liveClass.meetingLink || "",
       meetingId: liveClass.meetingId || "",
       meetingPassword: liveClass.meetingPassword || "",
-      scheduledDate: new Date(liveClass.scheduledDate).toISOString().slice(0, 16),
+      scheduleType: isPastOrNow ? "startnow" : "scheduled",
+      scheduledDate: scheduledDate.toISOString().slice(0, 16),
       duration: liveClass.duration || 60,
       maxParticipants: liveClass.maxParticipants || 100,
     });
@@ -127,6 +193,7 @@ function LiveClasses() {
       meetingLink: "",
       meetingId: "",
       meetingPassword: "",
+      scheduleType: "scheduled",
       scheduledDate: "",
       duration: 60,
       maxParticipants: 100,
@@ -179,17 +246,75 @@ function LiveClasses() {
             <FaVideo className="text-blue-600" />
             Live Classes
           </h1>
-          <button
-            onClick={() => {
-              resetForm();
-              setEditingClass(null);
-              setShowModal(true);
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <FaVideo /> Create Live Class
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setShowAllStudents(!showAllStudents);
+                if (!showAllStudents && allStudents.length === 0) {
+                  fetchAllStudents();
+                }
+              }}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+            >
+              <FaUsers /> {showAllStudents ? "Hide" : "Show"} All Students
+            </button>
+            <button
+              onClick={() => {
+                resetForm();
+                setEditingClass(null);
+                setShowModal(true);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <FaVideo /> Create Live Class
+            </button>
+          </div>
         </div>
+
+        {/* All Students List */}
+        {showAllStudents && (
+          <div className="mb-6 bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <FaUsers className="text-green-600" />
+              All Enrolled Students in App ({allStudents.length})
+            </h2>
+            {loadingStudents ? (
+              <div className="text-center py-8">Loading students...</div>
+            ) : allStudents.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No students found</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                {allStudents.map((student) => (
+                  <div
+                    key={student._id}
+                    className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-3">
+                      {student.photoUrl ? (
+                        <img
+                          src={student.photoUrl}
+                          alt={student.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                          {(student.name || "S").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-800 truncate">{student.name}</p>
+                        <p className="text-sm text-gray-600 truncate">{student.email}</p>
+                        {student.class && (
+                          <p className="text-xs text-gray-500">Class: {student.class}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <div className="text-center py-12">Loading...</div>
@@ -227,7 +352,14 @@ function LiveClasses() {
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <FaCalendarAlt />
-                    <span>{formatDate(liveClass.scheduledDate)}</span>
+                    <span>
+                      Scheduled: {formatDate(liveClass.scheduledDate)}
+                      {new Date(liveClass.scheduledDate) > new Date() && (
+                        <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs font-semibold">
+                          Future
+                        </span>
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <FaClock />
@@ -276,26 +408,44 @@ function LiveClasses() {
                   {liveClass.status === "scheduled" && (
                     <>
                       {liveClass.platformType === "portal" ? (
-                        <button
-                          onClick={async () => {
-                            await handleStatusChange(liveClass._id, "live");
-                            setCurrentLiveClassId(liveClass._id);
-                            setCurrentPlatformType("portal");
-                            setShowVideoPlayer(true);
-                          }}
-                          className="flex-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2 text-sm"
-                        >
-                          <FaPlay /> Start & Join
-                        </button>
+                        <>
+                          <button
+                            onClick={async () => {
+                              try {
+                                // Start the class immediately
+                                await handleStatusChange(liveClass._id, "live");
+                                setCurrentLiveClassId(liveClass._id);
+                                setCurrentPlatformType("portal");
+                                setShowVideoPlayer(true);
+                                toast.success("Live class started! Students can now join.");
+                              } catch (error) {
+                                toast.error("Failed to start live class");
+                              }
+                            }}
+                            className="flex-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2 text-sm font-semibold"
+                          >
+                            <FaPlay /> Start Now
+                          </button>
+                        </>
                       ) : (
-                        <a
-                          href={liveClass.meetingLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2 text-sm"
-                        >
-                          <FaPlay /> Start Meeting
-                        </a>
+                        <>
+                          <button
+                            onClick={async () => {
+                              try {
+                                // Start the class immediately
+                                await handleStatusChange(liveClass._id, "live");
+                                toast.success("Live class started! Opening meeting link...");
+                                // Open meeting link in new tab
+                                window.open(liveClass.meetingLink, '_blank');
+                              } catch (error) {
+                                toast.error("Failed to start live class");
+                              }
+                            }}
+                            className="flex-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 flex items-center justify-center gap-2 text-sm font-semibold"
+                          >
+                            <FaPlay /> Start Now
+                          </button>
+                        </>
                       )}
                     </>
                   )}
@@ -535,21 +685,56 @@ function LiveClasses() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4">
+                {/* Schedule Type Selection */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Schedule Type *</label>
+                  <select
+                    required
+                    value={formData.scheduleType || "scheduled"}
+                    onChange={(e) =>
+                      setFormData({ ...formData, scheduleType: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border rounded-lg"
+                  >
+                    <option value="scheduled">Schedule for Later (Date & Time)</option>
+                    <option value="startnow">Start Now (Immediately)</option>
+                  </select>
+                </div>
+
+                {/* Scheduled Date & Time - Only show if "scheduled" is selected */}
+                {formData.scheduleType === "scheduled" && (
                   <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Scheduled Date & Time *
-                    </label>
+                    <label className="block text-sm font-medium mb-1">Scheduled Date & Time *</label>
                     <input
                       type="datetime-local"
-                      required
+                      required={formData.scheduleType === "scheduled"}
                       value={formData.scheduledDate}
                       onChange={(e) =>
                         setFormData({ ...formData, scheduledDate: e.target.value })
                       }
                       className="w-full px-3 py-2 border rounded-lg"
+                      min={new Date().toISOString().slice(0, 16)}
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select a future date and time for the live class
+                    </p>
                   </div>
+                )}
+
+                {/* Start Now Info - Only show if "startnow" is selected */}
+                {formData.scheduleType === "startnow" && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 font-semibold flex items-center gap-2">
+                      <FaPlay className="text-green-600" />
+                      Start Now Selected
+                    </p>
+                    <p className="text-xs text-green-700 mt-1">
+                      The live class will start immediately after creation. You'll be able to join right away.
+                    </p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Duration (minutes)
@@ -560,6 +745,20 @@ function LiveClasses() {
                       value={formData.duration}
                       onChange={(e) =>
                         setFormData({ ...formData, duration: parseInt(e.target.value) })
+                      }
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Max Participants
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.maxParticipants}
+                      onChange={(e) =>
+                        setFormData({ ...formData, maxParticipants: parseInt(e.target.value) })
                       }
                       className="w-full px-3 py-2 border rounded-lg"
                     />

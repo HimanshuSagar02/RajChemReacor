@@ -18,10 +18,53 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
   const [showChat, setShowChat] = useState(true);
   const [error, setError] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [participantDetails, setParticipantDetails] = useState({});
+  const [showParticipants, setShowParticipants] = useState(isEducator); // Show by default for educators
 
   const videoRefs = useRef({});
   const localVideoRef = useRef(null);
   const screenShareRef = useRef(null);
+
+  const fetchParticipantDetails = async (identity) => {
+    try {
+      // Try to fetch user details from backend using identity (email or userId)
+      try {
+        const response = await axios.get(
+          `${serverUrl}/api/user/participant/${encodeURIComponent(identity)}`,
+          { withCredentials: true }
+        );
+        if (response.data) {
+          setParticipantDetails(prev => ({
+            ...prev,
+            [identity]: {
+              name: response.data.name || identity.split('@')[0] || identity,
+              email: response.data.email || (identity.includes('@') ? identity : ""),
+              role: response.data.role || "student",
+              photoUrl: response.data.photoUrl || "",
+              class: response.data.class || "",
+              subject: response.data.subject || ""
+            }
+          }));
+          return;
+        }
+      } catch (apiError) {
+        console.log(`[LiveKit] Could not fetch details for ${identity}, using fallback`);
+      }
+      
+      // Fallback: use identity as name
+      setParticipantDetails(prev => ({
+        ...prev,
+        [identity]: {
+          name: identity.split('@')[0] || identity,
+          email: identity.includes('@') ? identity : "",
+          role: "student",
+          photoUrl: ""
+        }
+      }));
+    } catch (error) {
+      console.warn("Could not fetch participant details:", error);
+    }
+  };
 
   useEffect(() => {
     // Check browser compatibility
@@ -114,8 +157,12 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
         toast.success("Reconnected!");
       });
 
-      newRoom.on(RoomEvent.ParticipantConnected, (participant) => {
+      newRoom.on(RoomEvent.ParticipantConnected, async (participant) => {
         console.log("Participant connected:", participant.identity);
+        // Fetch participant details if educator
+        if (isEducator) {
+          await fetchParticipantDetails(participant.identity);
+        }
         updateParticipants();
       });
 
@@ -224,27 +271,43 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
         }
       }
 
-      // Enable camera and microphone for educators (optional - won't fail if denied)
-      if (isEducator) {
-        try {
-          await newRoom.localParticipant.setCameraEnabled(true);
-          setIsVideoEnabled(true);
-          console.log("Camera enabled");
-        } catch (camError) {
-          console.warn("Failed to enable camera:", camError);
+      // Enable camera and microphone for ALL participants (educators and students)
+      // This ensures everyone can see and be seen
+      // Request permissions first, then enable
+      try {
+        // Request camera permission
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoStream.getTracks().forEach(track => track.stop()); // Stop test stream
+        
+        await newRoom.localParticipant.setCameraEnabled(true);
+        setIsVideoEnabled(true);
+        console.log("✅ Camera enabled for", isEducator ? "educator" : "student");
+      } catch (camError) {
+        console.warn("Failed to enable camera:", camError);
+        if (camError.name === "NotAllowedError" || camError.name === "PermissionDeniedError") {
+          toast.warning("Camera permission denied. Please allow camera access.");
+        } else {
           toast.warning("Camera access denied or unavailable. You can still participate.");
-          setIsVideoEnabled(false);
         }
+        setIsVideoEnabled(false);
+      }
 
-        try {
-          await newRoom.localParticipant.setMicrophoneEnabled(true);
-          setIsAudioEnabled(true);
-          console.log("Microphone enabled");
-        } catch (micError) {
-          console.warn("Failed to enable microphone:", micError);
+      try {
+        // Request microphone permission
+        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioStream.getTracks().forEach(track => track.stop()); // Stop test stream
+        
+        await newRoom.localParticipant.setMicrophoneEnabled(true);
+        setIsAudioEnabled(true);
+        console.log("✅ Microphone enabled for", isEducator ? "educator" : "student");
+      } catch (micError) {
+        console.warn("Failed to enable microphone:", micError);
+        if (micError.name === "NotAllowedError" || micError.name === "PermissionDeniedError") {
+          toast.warning("Microphone permission denied. Please allow microphone access.");
+        } else {
           toast.warning("Microphone access denied or unavailable. You can still participate.");
-          setIsAudioEnabled(false);
         }
+        setIsAudioEnabled(false);
       }
 
       updateParticipants();
@@ -285,6 +348,15 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
     ].filter(Boolean);
 
     setParticipants(allParticipants);
+    
+    // Fetch details for new participants if educator
+    if (isEducator) {
+      allParticipants.forEach(participant => {
+        if (participant !== room.localParticipant && !participantDetails[participant.identity]) {
+          fetchParticipantDetails(participant.identity);
+        }
+      });
+    }
   };
 
   const attachTrack = (track, participant) => {
@@ -479,6 +551,16 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
           <span className="text-sm text-gray-400">
             {participants.length} participant{participants.length !== 1 ? "s" : ""}
           </span>
+          {isEducator && (
+            <button
+              onClick={() => setShowParticipants(!showParticipants)}
+              className="flex items-center gap-2 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+              title="Show participants list"
+            >
+              <FaUsers className="w-4 h-4" />
+              <span className="text-sm">Participants</span>
+            </button>
+          )}
         </div>
         <button
           onClick={handleClose}
@@ -575,6 +657,71 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
           )}
         </div>
 
+        {/* Participants Sidebar (Educator only) */}
+        {showParticipants && isEducator && (
+          <div className="w-80 bg-gray-900 border-l border-gray-700 flex flex-col">
+            <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+              <h3 className="font-semibold text-white">Participants ({participants.length})</h3>
+              <button
+                onClick={() => setShowParticipants(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <FaTimes className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {participants.map((participant) => {
+                const details = participantDetails[participant.identity] || {};
+                const isLocal = participant === room?.localParticipant;
+                const hasVideo = Array.from(participant.videoTrackPublications.values()).some(pub => pub.track);
+                const hasAudio = Array.from(participant.audioTrackPublications.values()).some(pub => pub.track);
+                
+                return (
+                  <div key={participant.identity} className="bg-gray-800 rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      {details.photoUrl ? (
+                        <img 
+                          src={details.photoUrl} 
+                          alt={details.name || participant.identity}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-semibold">
+                          {(details.name || participant.identity || "U").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-semibold text-sm truncate">
+                          {details.name || participant.name || participant.identity}
+                          {isLocal && " (You)"}
+                        </p>
+                        {details.email && (
+                          <p className="text-gray-400 text-xs truncate">{details.email}</p>
+                        )}
+                        {details.role && (
+                          <p className="text-gray-500 text-xs capitalize">{details.role}</p>
+                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                          {hasVideo ? (
+                            <FaVideo className="w-3 h-3 text-green-400" title="Camera on" />
+                          ) : (
+                            <FaVideoSlash className="w-3 h-3 text-gray-500" title="Camera off" />
+                          )}
+                          {hasAudio ? (
+                            <FaMicrophone className="w-3 h-3 text-green-400" title="Microphone on" />
+                          ) : (
+                            <FaMicrophoneSlash className="w-3 h-3 text-gray-500" title="Microphone off" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Chat Sidebar */}
         {showChat && (
           <div className="w-80 bg-gray-900 border-l border-gray-700 flex flex-col">
@@ -620,28 +767,27 @@ function LiveKitPlayer({ liveClassId, userRole, onClose, isEducator = false }) {
       {/* Controls */}
       {isConnected && (
         <div className="bg-black border-t border-gray-700 p-4 flex items-center justify-center gap-4">
-          {(isEducator || isVideoEnabled) && (
-            <button
-              onClick={isVideoEnabled ? disableCamera : enableCamera}
-              className={`p-3 rounded-lg transition-colors ${
-                isVideoEnabled ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-red-600 text-white hover:bg-red-700"
-              }`}
-              title={isVideoEnabled ? "Turn off camera" : "Turn on camera"}
-            >
-              {isVideoEnabled ? <FaVideo className="w-5 h-5" /> : <FaVideoSlash className="w-5 h-5" />}
-            </button>
-          )}
-          {(isEducator || isAudioEnabled) && (
-            <button
-              onClick={isAudioEnabled ? disableMicrophone : enableMicrophone}
-              className={`p-3 rounded-lg transition-colors ${
-                isAudioEnabled ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-red-600 text-white hover:bg-red-700"
-              }`}
-              title={isAudioEnabled ? "Turn off microphone" : "Turn on microphone"}
-            >
-              {isAudioEnabled ? <FaMicrophone className="w-5 h-5" /> : <FaMicrophoneSlash className="w-5 h-5" />}
-            </button>
-          )}
+          {/* Camera control - available for all participants */}
+          <button
+            onClick={isVideoEnabled ? disableCamera : enableCamera}
+            className={`p-3 rounded-lg transition-colors ${
+              isVideoEnabled ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-red-600 text-white hover:bg-red-700"
+            }`}
+            title={isVideoEnabled ? "Turn off camera" : "Turn on camera"}
+          >
+            {isVideoEnabled ? <FaVideo className="w-5 h-5" /> : <FaVideoSlash className="w-5 h-5" />}
+          </button>
+          
+          {/* Microphone control - available for all participants */}
+          <button
+            onClick={isAudioEnabled ? disableMicrophone : enableMicrophone}
+            className={`p-3 rounded-lg transition-colors ${
+              isAudioEnabled ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-red-600 text-white hover:bg-red-700"
+            }`}
+            title={isAudioEnabled ? "Turn off microphone" : "Turn on microphone"}
+          >
+            {isAudioEnabled ? <FaMicrophone className="w-5 h-5" /> : <FaMicrophoneSlash className="w-5 h-5" />}
+          </button>
           {isEducator && (
             <button
               onClick={toggleScreenShare}

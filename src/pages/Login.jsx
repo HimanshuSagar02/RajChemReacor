@@ -38,9 +38,14 @@ function Login() {
             const result = await axios.post(`${serverUrl}/api/auth/login`, {email, password}, {withCredentials: true})
             
             if (result.data && result.data._id) {
+                console.log("[Login] Login successful, user data:", result.data);
                 dispatch(setUserData(result.data))
-                navigate("/")
-                toast.success("Login Successfully")
+                
+                // Small delay to ensure cookie is set before navigation
+                setTimeout(() => {
+                    navigate("/")
+                    toast.success("Login Successfully")
+                }, 100);
             } else {
                 throw new Error("Invalid response from server")
             }
@@ -76,12 +81,22 @@ function Login() {
     const googleLogin = async () => {
         setGoogleLoading(true)
         try {
+            console.log("[GoogleLogin] Starting Google sign-in...");
+            console.log("[GoogleLogin] Auth object:", auth ? "Available" : "Missing");
+            console.log("[GoogleLogin] Provider object:", provider ? "Available" : "Missing");
+            
             if (!auth || !provider) {
-                toast.error("Google sign-in is not configured. Please set VITE_FIREBASE_APIKEY in .env file.")
+                console.error("[GoogleLogin] Firebase not initialized properly");
+                console.error("[GoogleLogin] Auth:", auth);
+                console.error("[GoogleLogin] Provider:", provider);
+                toast.error("Google sign-in is not configured. Please check browser console for details.")
                 setGoogleLoading(false)
                 return
             }
+            
+            console.log("[GoogleLogin] Calling signInWithPopup...");
             const response = await signInWithPopup(auth, provider)
+            console.log("[GoogleLogin] Google sign-in successful:", response.user.email);
             
             let user = response.user
             let name = user.displayName || "User";
@@ -89,52 +104,83 @@ function Login() {
             let photoUrl = user.photoURL || ""
             
             if (!email) {
+                console.error("[GoogleLogin] No email provided by Google");
                 toast.error("Email not provided by Google")
                 setGoogleLoading(false)
                 return
             }
             
+            console.log("[GoogleLogin] Sending user data to backend...");
             const result = await axios.post(serverUrl + "/api/auth/googlesignup", {
                 name, 
                 email, 
                 photoUrl
             }, {withCredentials: true})
             
+            console.log("[GoogleLogin] Backend response received:", result.data ? "Success" : "Failed");
             dispatch(setUserData(result.data))
-            navigate("/")
-            toast.success("Login Successfully")
+            
+            // Small delay to ensure cookie is set
+            setTimeout(() => {
+                navigate("/")
+                toast.success("Login Successfully")
+            }, 100);
             setGoogleLoading(false)
         } catch (error) {
-            console.log("Google login error:", error)
+            console.error("[GoogleLogin] Error details:", {
+                code: error.code,
+                message: error.message,
+                name: error.name,
+                stack: error.stack
+            });
             setGoogleLoading(false)
+            
+            // Firebase Auth errors
             if (error.code === 'auth/popup-closed-by-user') {
-                toast.error("Sign-in popup was closed")
+                toast.error("Sign-in popup was closed. Please try again.")
             } else if (error.code === 'auth/popup-blocked') {
-                toast.error("Popup was blocked. Please allow popups for this site.")
+                toast.error("Popup was blocked. Please allow popups for this site and try again.")
             } else if (error.code === 'auth/cancelled-popup-request') {
+                console.log("[GoogleLogin] Popup request cancelled");
                 return
+            } else if (error.code === 'auth/operation-not-allowed') {
+                toast.error("Google sign-in is not enabled. Please enable it in Firebase Console.")
+            } else if (error.code === 'auth/unauthorized-domain') {
+                toast.error("This domain is not authorized. Please add it to Firebase authorized domains.")
+            } else if (error.code === 'auth/invalid-api-key') {
+                toast.error("Invalid Firebase API key. Please check your Firebase configuration.")
+            } else if (error.code === 'auth/network-request-failed') {
+                toast.error("Network error. Please check your internet connection.")
+            } else if (error.code) {
+                // Other Firebase errors
+                console.error("[GoogleLogin] Firebase error code:", error.code);
+                toast.error(`Google sign-in error: ${error.message || error.code}`)
             } else if (error.response?.data?.message) {
+                // Backend errors
+                console.error("[GoogleLogin] Backend error:", error.response.data.message);
                 toast.error(error.response.data.message)
             } else {
-                toast.error("Google sign-in failed. Please try again.")
+                // Unknown errors
+                console.error("[GoogleLogin] Unknown error:", error);
+                toast.error(`Google sign-in failed: ${error.message || "Please try again"}`)
             }
         }
     }
 
     return (
-        <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4'>
-            <div className='w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
+        <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3 sm:p-4'>
+            <div className='w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
                 {/* Left Side - Form */}
-                <div className='w-full md:w-[60%] p-8 md:p-12 flex flex-col justify-center'>
+                <div className='w-full md:w-[60%] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center'>
                     {/* Header */}
-                    <div className='mb-8'>
-                        <div className='flex items-center gap-3 mb-2'>
-                            <div className='w-12 h-12 bg-black rounded-xl flex items-center justify-center'>
-                                <span className='text-[#FFD700] text-2xl font-bold'>RCR</span>
+                    <div className='mb-6 md:mb-8'>
+                        <div className='flex items-center gap-2 sm:gap-3 mb-2'>
+                            <div className='w-10 h-10 sm:w-12 sm:h-12 bg-black rounded-lg sm:rounded-xl flex items-center justify-center'>
+                                <span className='text-[#FFD700] text-xl sm:text-2xl font-bold'>RCR</span>
                             </div>
                             <div>
-                                <h1 className='text-3xl font-bold text-gray-900'>Welcome Back</h1>
-                                <p className='text-gray-600'>Login to your RCR account</p>
+                                <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>Welcome Back</h1>
+                                <p className='text-sm sm:text-base text-gray-600'>Login to your RCR account</p>
                             </div>
                         </div>
                     </div>
@@ -264,15 +310,15 @@ function Login() {
                 </div>
 
                 {/* Right Side - Branding */}
-                <div className='w-full md:w-[40%] bg-gradient-to-br from-black via-gray-900 to-black p-12 flex flex-col items-center justify-center text-center relative overflow-hidden'>
+                <div className='w-full md:w-[40%] bg-gradient-to-br from-black via-gray-900 to-black p-6 sm:p-8 md:p-12 flex flex-col items-center justify-center text-center relative overflow-hidden'>
                     {/* Decorative Elements */}
-                    <div className='absolute top-0 right-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
-                    <div className='absolute bottom-0 left-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+                    <div className='absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+                    <div className='absolute bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
                     
                     <div className='relative z-10'>
-                        <img src={logo} className='w-32 h-32 mx-auto mb-6 rounded-2xl border-4 border-[#FFD700] shadow-2xl' alt="RCR Logo" />
-                        <h2 className='text-5xl font-bold text-[#FFD700] mb-3'>RCR</h2>
-                        <p className='text-xl text-white mb-6 font-semibold'>RAJ CHEM REACTOR</p>
+                        <img src={logo} className='w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto mb-4 md:mb-6 rounded-xl sm:rounded-2xl border-4 border-[#FFD700] shadow-2xl' alt="RCR Logo" />
+                        <h2 className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#FFD700] mb-2 md:mb-3'>RCR</h2>
+                        <p className='text-base sm:text-lg md:text-xl text-white mb-4 md:mb-6 font-semibold'>RAJ CHEM REACTOR</p>
                         <div className='bg-black bg-opacity-50 rounded-2xl p-6 border border-[#FFD700] border-opacity-30'>
                             <div className='flex items-center justify-center gap-2 mb-4'>
                                 <FaGraduationCap className='text-[#FFD700] text-2xl' />

@@ -13,7 +13,8 @@ import {
   FaVideo, 
   FaGraduationCap,
   FaQuestionCircle,
-  FaTachometerAlt
+  FaTachometerAlt,
+  FaCog
 } from "react-icons/fa";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
@@ -104,20 +105,20 @@ function EducatorDashboard() {
       <div className="max-w-7xl mx-auto">
         <button
           onClick={() => navigate("/")}
-          className='fixed top-[100px] left-[20px] z-10 bg-black text-[#FFD700] p-3 rounded-full shadow-lg hover:bg-gray-900 transition-all border-2 border-[#FFD700]'
+          className='fixed top-[100px] left-[10px] md:left-[20px] z-10 bg-black text-[#FFD700] p-2 md:p-3 rounded-full shadow-lg hover:bg-gray-900 transition-all border-2 border-[#FFD700]'
           aria-label="Go back"
         >
-          <FaArrowLeftLong className='w-[22px] h-[22px]' />
+          <FaArrowLeftLong className='w-[18px] h-[18px] md:w-[22px] md:h-[22px]' />
         </button>
 
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-8 mb-8 border-2 border-[#FFD700] relative overflow-hidden">
+        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 border-2 border-[#FFD700] relative overflow-hidden">
           {/* Decorative Elements */}
-          <div className='absolute top-0 right-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
-          <div className='absolute bottom-0 left-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+          <div className='absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+          <div className='absolute bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
           
-          <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-            <div className="w-32 h-32 rounded-full bg-[#FFD700] flex items-center justify-center border-4 border-white shadow-2xl">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 relative z-10">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-[#FFD700] flex items-center justify-center border-4 border-white shadow-2xl">
               {userData?.photoUrl ? (
                 <img
                   src={userData.photoUrl}
@@ -129,23 +130,23 @@ function EducatorDashboard() {
                   }}
                 />
               ) : null}
-              <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-4xl font-bold text-[#FFD700]" style={{ display: userData?.photoUrl ? 'none' : 'flex' }}>
+              <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFD700]" style={{ display: userData?.photoUrl ? 'none' : 'flex' }}>
                 {userData?.name?.charAt(0)?.toUpperCase() || "E"}
               </div>
             </div>
             <div className="text-center md:text-left space-y-3 flex-1">
-              <h1 className="text-4xl font-bold text-[#FFD700] mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFD700] mb-2">
                 Welcome, {userData?.name || "Educator"} 👋
               </h1>
-              <h2 className='text-2xl font-semibold text-white'>
+              <h2 className='text-lg sm:text-xl md:text-2xl font-semibold text-white'>
                 Total Earnings: <span className='font-bold text-[#FFD700]'>₹{totalEarnings.toLocaleString()}</span>
               </h2>
-              <p className="text-gray-300 text-base">
+              <p className="text-gray-300 text-sm sm:text-base">
                 {userData?.description || "Start creating amazing courses for your students!"}
               </p>
             </div>
             <button 
-              className='px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center justify-center gap-2' 
+              className='w-full md:w-auto px-4 md:px-6 py-2 md:py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center justify-center gap-2 text-sm md:text-base' 
               onClick={() => navigate("/courses")}
             >
               Create Courses
@@ -154,105 +155,114 @@ function EducatorDashboard() {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="bg-white rounded-2xl shadow-xl mb-6 p-4 border-2 border-gray-100">
-          <div className="flex flex-wrap gap-3">
+        <div className="bg-white rounded-2xl shadow-xl mb-6 p-3 md:p-4 border-2 border-gray-100">
+          <div className="flex flex-wrap gap-2 md:gap-3">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "overview" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               <FaTachometerAlt 
-                className={`w-5 h-5 transition-all ${activeTab === "overview" ? "text-[#FFD700]" : "text-[#FFEB3B]"}`} 
+                className={`w-4 h-4 md:w-5 md:h-5 transition-all ${activeTab === "overview" ? "text-[#FFD700]" : "text-[#FFEB3B]"}`} 
                 style={{ 
                   filter: activeTab !== "overview" ? "drop-shadow(0 2px 4px rgba(255, 235, 59, 0.4))" : "drop-shadow(0 2px 4px rgba(255, 215, 0, 0.6))",
                   opacity: activeTab === "overview" ? 1 : 0.85
                 }} 
               />
-              Overview
+              <span className="hidden sm:inline">Overview</span>
+              <span className="sm:hidden">Overview</span>
             </button>
             <button
               onClick={() => setActiveTab("courses")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "courses" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaBook /> Courses
+              <FaBook className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Courses</span>
             </button>
             <button
               onClick={() => setActiveTab("assignments")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "assignments" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaClipboardList /> Assignments
+              <FaClipboardList className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Assignments</span>
             </button>
             <button
               onClick={() => setActiveTab("students")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "students" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaUsers /> My Students
+              <FaUsers className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">My Students</span>
             </button>
             <button
               onClick={() => setActiveTab("attendance")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "attendance" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaCalendarCheck /> Attendance
+              <FaCalendarCheck className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Attendance</span>
             </button>
             <button
               onClick={() => setActiveTab("notifications")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "notifications" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaBell /> Notifications
+              <FaBell className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Notifications</span>
             </button>
             <button
               onClick={() => setActiveTab("liveclasses")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "liveclasses" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaVideo /> Live Classes
+              <FaVideo className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Live Classes</span>
             </button>
             <button
               onClick={() => setActiveTab("grades")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "grades" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaGraduationCap /> Grades
+              <FaGraduationCap className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Grades</span>
             </button>
             <button
               onClick={() => setActiveTab("doubts")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base ${
                 activeTab === "doubts" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaQuestionCircle /> Doubts
+              <FaQuestionCircle className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Doubts</span>
             </button>
+            {userData?.role === "admin" && (
+              <button
+                onClick={() => navigate("/admin/portal")}
+                className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base bg-red-600 text-white hover:bg-red-700`}
+              >
+                <FaCog className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Portal Management</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -263,7 +273,7 @@ function EducatorDashboard() {
               <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
               
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-6">
                 <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
                   

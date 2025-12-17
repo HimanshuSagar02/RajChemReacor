@@ -2,16 +2,18 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../App";
 import LiveVideoPlayer from "../components/LiveVideoPlayer";
 import LiveKitPlayer from "../components/LiveKitPlayer";
-import { FaBook, FaClipboardList, FaBell, FaGraduationCap, FaUser, FaEnvelope, FaClock, FaCalendarCheck, FaVideo } from "react-icons/fa";
+import { FaBook, FaClipboardList, FaBell, FaGraduationCap, FaUser, FaEnvelope, FaClock, FaCalendarCheck, FaVideo, FaPlay } from "react-icons/fa";
 
 function StudentDashboard() {
+  const navigate = useNavigate();
   const { userData } = useSelector((state) => state.user);
   const { courseData } = useSelector((state) => state.course);
 
-  const [activeTab, setActiveTab] = useState("notifications");
+  const [activeTab, setActiveTab] = useState("mycourses");
 
   // Safety check - show loading if userData is not available
   if (!userData) {
@@ -332,16 +334,16 @@ function StudentDashboard() {
     : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 pt-24 pb-8 px-4 md:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 pt-20 sm:pt-24 pb-6 md:pb-8 px-3 sm:px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Student Profile Header */}
-        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-8 mb-8 border-2 border-[#FFD700] relative overflow-hidden">
+        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 mb-6 md:mb-8 border-2 border-[#FFD700] relative overflow-hidden">
           {/* Decorative Elements */}
-          <div className='absolute top-0 right-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
-          <div className='absolute bottom-0 left-0 w-64 h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+          <div className='absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
+          <div className='absolute bottom-0 left-0 w-32 h-32 md:w-64 md:h-64 bg-[#FFD700] opacity-10 rounded-full blur-3xl'></div>
           
-          <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-            <div className="w-32 h-32 rounded-full bg-[#FFD700] flex items-center justify-center border-4 border-white shadow-2xl">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 relative z-10">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full bg-[#FFD700] flex items-center justify-center border-4 border-white shadow-2xl">
               {userData?.photoUrl ? (
                 <img
                   src={userData.photoUrl}
@@ -353,13 +355,13 @@ function StudentDashboard() {
                   }}
                 />
               ) : null}
-              <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-4xl font-bold text-[#FFD700]" style={{ display: userData?.photoUrl ? 'none' : 'flex' }}>
+              <div className="w-full h-full rounded-full bg-black flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFD700]" style={{ display: userData?.photoUrl ? 'none' : 'flex' }}>
                 {userData?.name?.charAt(0)?.toUpperCase() || "S"}
               </div>
             </div>
-            <div className="text-center md:text-left space-y-3 flex-1">
+            <div className="text-center md:text-left space-y-2 md:space-y-3 flex-1">
               <div>
-                <h1 className="text-4xl font-bold text-[#FFD700] mb-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFD700] mb-2">
                   Welcome, {userData?.name || "Student"} 👋
                 </h1>
                 {userData?.class && (
@@ -368,22 +370,22 @@ function StudentDashboard() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                <div className="flex items-center gap-2 text-white">
-                  <FaEnvelope className="text-[#FFD700]" />
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-4 text-xs sm:text-sm">
+                <div className="flex items-center gap-1 md:gap-2 text-white">
+                  <FaEnvelope className="text-[#FFD700] text-xs sm:text-sm" />
                   <span className="font-semibold text-[#FFD700]">Email:</span>
-                  <span className="text-gray-200">{userData?.email || "N/A"}</span>
+                  <span className="text-gray-200 truncate max-w-[150px] sm:max-w-none">{userData?.email || "N/A"}</span>
                 </div>
                 {userData?.subject && (
-                  <div className="flex items-center gap-2 text-white">
-                    <FaBook className="text-[#FFD700]" />
+                  <div className="flex items-center gap-1 md:gap-2 text-white">
+                    <FaBook className="text-[#FFD700] text-xs sm:text-sm" />
                     <span className="font-semibold text-[#FFD700]">Subject:</span>
                     <span className="text-gray-200">{userData.subject}</span>
                   </div>
                 )}
                 {userData?.totalActiveMinutes && (
-                  <div className="flex items-center gap-2 text-white">
-                    <FaClock className="text-[#FFD700]" />
+                  <div className="flex items-center gap-1 md:gap-2 text-white">
+                    <FaClock className="text-[#FFD700] text-xs sm:text-sm" />
                     <span className="text-gray-200">Activity: {Math.round((userData.totalActiveMinutes || 0) / 60)} hours</span>
                   </div>
                 )}
@@ -393,161 +395,266 @@ function StudentDashboard() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
             {/* Decorative background element */}
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+            <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-[#FFD700] opacity-10 rounded-full -mr-8 md:-mr-12 -mt-8 md:-mt-12 group-hover:opacity-20 transition-opacity"></div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <FaBook className="text-white text-2xl" />
+            <div className="flex items-center justify-between mb-2 md:mb-4 relative z-10">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-lg md:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaBook className="text-white text-lg sm:text-xl md:text-2xl" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">My Courses</p>
-                  <p className="text-xs font-medium text-gray-500 mt-0.5">Enrolled Programs</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 uppercase tracking-wide">My Courses</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 mt-0.5">Enrolled Programs</p>
                 </div>
               </div>
             </div>
             <div className="relative z-10">
-              <p className="text-4xl font-black text-black mb-1 tracking-tight">{totalEnrolledCourses}</p>
-              <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">Active Learning</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 tracking-tight">{totalEnrolledCourses}</p>
+              <p className="text-[10px] sm:text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-1 md:mt-2">Active Learning</p>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-black opacity-5 rounded-full -mr-8 md:-mr-12 -mt-8 md:-mt-12 group-hover:opacity-10 transition-opacity"></div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <FaClipboardList className="text-white text-2xl" />
+            <div className="flex items-center justify-between mb-2 md:mb-4 relative z-10">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-black to-gray-700 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaClipboardList className="text-white text-lg sm:text-xl md:text-2xl" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">My Tasks</p>
-                  <p className="text-xs font-medium text-gray-500 mt-0.5">Assignments</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 uppercase tracking-wide">My Tasks</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 mt-0.5">Assignments</p>
                 </div>
               </div>
             </div>
             <div className="relative z-10">
-              <p className="text-4xl font-black text-black mb-1 tracking-tight">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 tracking-tight">
                 {completedAssignments}/{totalAssignments}
               </p>
-              <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Completed Tasks</p>
+              <p className="text-[10px] sm:text-xs font-bold text-black uppercase tracking-wider mt-1 md:mt-2">Completed Tasks</p>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-2xl shadow-xl p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#FFD700] opacity-10 rounded-full -mr-12 -mt-12 group-hover:opacity-20 transition-opacity"></div>
+          <div className="bg-gradient-to-br from-white to-yellow-50 rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border-2 border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 hover:border-[#FFC107] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-[#FFD700] opacity-10 rounded-full -mr-8 md:-mr-12 -mt-8 md:-mt-12 group-hover:opacity-20 transition-opacity"></div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <FaBell className="text-white text-2xl" />
+            <div className="flex items-center justify-between mb-2 md:mb-4 relative z-10">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#FFD700] to-[#FFC107] rounded-lg md:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaBell className="text-white text-lg sm:text-xl md:text-2xl" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Alerts</p>
-                  <p className="text-xs font-medium text-gray-500 mt-0.5">Notifications</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 uppercase tracking-wide">Alerts</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 mt-0.5">Notifications</p>
                 </div>
               </div>
             </div>
             <div className="relative z-10">
-              <p className="text-4xl font-black text-black mb-1 tracking-tight">{totalNotifications}</p>
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 tracking-tight">{totalNotifications}</p>
               {unreadNotifications > 0 ? (
-                <p className="text-xs font-bold text-red-600 uppercase tracking-wider mt-2">{unreadNotifications} Unread</p>
+                <p className="text-[10px] sm:text-xs font-bold text-red-600 uppercase tracking-wider mt-1 md:mt-2">{unreadNotifications} Unread</p>
               ) : (
-                <p className="text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-2">All Read</p>
+                <p className="text-[10px] sm:text-xs font-bold text-[#FFD700] uppercase tracking-wider mt-1 md:mt-2">All Read</p>
               )}
             </div>
           </div>
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-black opacity-5 rounded-full -mr-12 -mt-12 group-hover:opacity-10 transition-opacity"></div>
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border-2 border-black hover:shadow-2xl transition-all hover:scale-105 hover:border-gray-700 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-16 h-16 md:w-24 md:h-24 bg-black opacity-5 rounded-full -mr-8 md:-mr-12 -mt-8 md:-mt-12 group-hover:opacity-10 transition-opacity"></div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 bg-gradient-to-br from-black to-gray-700 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <FaGraduationCap className="text-white text-2xl" />
+            <div className="flex items-center justify-between mb-2 md:mb-4 relative z-10">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-black to-gray-700 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <FaGraduationCap className="text-white text-lg sm:text-xl md:text-2xl" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">Performance</p>
-                  <p className="text-xs font-medium text-gray-500 mt-0.5">Average Grade</p>
+                  <p className="text-xs sm:text-sm font-bold text-gray-800 uppercase tracking-wide">Performance</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 mt-0.5">Average Grade</p>
                 </div>
               </div>
             </div>
             <div className="relative z-10">
-              <p className="text-4xl font-black text-black mb-1 tracking-tight">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-black mb-1 tracking-tight">
                 {averageGrade !== null ? `${averageGrade}%` : "N/A"}
               </p>
-              <p className="text-xs font-bold text-black uppercase tracking-wider mt-2">Overall Score</p>
+              <p className="text-[10px] sm:text-xs font-bold text-black uppercase tracking-wider mt-1 md:mt-2">Overall Score</p>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 border-2 border-gray-100">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-3 sm:p-4 md:p-6 border-2 border-gray-100">
           {/* Tab Navigation */}
-          <div className="flex flex-wrap gap-3 mb-8 pb-4 border-b-2 border-gray-200">
+          <div className="flex flex-wrap gap-2 md:gap-3 mb-4 md:mb-8 pb-3 md:pb-4 border-b-2 border-gray-200 overflow-x-auto">
+            <button
+              onClick={() => setActiveTab("mycourses")}
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
+                activeTab === "mycourses" 
+                  ? "bg-black text-[#FFD700] shadow-lg" 
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              <FaBook className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">My Courses</span>
+            </button>
             <button
               onClick={() => setActiveTab("notifications")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "notifications" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaBell /> Notifications
+              <FaBell className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Notifications</span>
             </button>
             <button
               onClick={() => setActiveTab("assignments")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "assignments" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaClipboardList /> Assignments
+              <FaClipboardList className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Assignments</span>
             </button>
             <button
               onClick={() => setActiveTab("shared")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "shared" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaBook /> Shared Notes
+              <FaBook className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Shared Notes</span>
             </button>
             <button
               onClick={() => setActiveTab("attendance")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "attendance" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaCalendarCheck /> Attendance
+              <FaCalendarCheck className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Attendance</span>
             </button>
             <button
               onClick={() => setActiveTab("liveclasses")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "liveclasses" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaVideo /> Live Classes
+              <FaVideo className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">Live Classes</span>
             </button>
             <button
               onClick={() => setActiveTab("grades")}
-              className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${
+              className={`px-3 md:px-6 py-2 md:py-3 rounded-xl font-semibold transition-all flex items-center gap-2 text-sm md:text-base whitespace-nowrap ${
                 activeTab === "grades" 
                   ? "bg-black text-[#FFD700] shadow-lg" 
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              <FaGraduationCap /> My Grades
+              <FaGraduationCap className="w-4 h-4 md:w-5 md:h-5" /> <span className="hidden sm:inline">My Grades</span>
             </button>
           </div>
 
           {/* Tab Content */}
+          {activeTab === "mycourses" && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#FFD700] bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <FaBook className="text-[#FFD700] text-xl" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">My Enrolled Courses</h2>
+                </div>
+                <button
+                  onClick={() => navigate("/allcourses")}
+                  className="px-4 py-2 bg-black text-[#FFD700] font-semibold rounded-xl hover:bg-gray-900 transition-all flex items-center gap-2"
+                >
+                  <FaBook className="text-sm" /> Browse More
+                </button>
+              </div>
+              
+              {!enrolledCourses || enrolledCourses.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                  <FaBook className="text-6xl text-gray-400 mx-auto mb-4" />
+                  <p className="text-xl font-semibold text-gray-600 mb-2">No Enrolled Courses</p>
+                  <p className="text-gray-500 mb-4">You haven't enrolled in any courses yet.</p>
+                  <button
+                    onClick={() => navigate("/allcourses")}
+                    className="px-6 py-3 bg-black text-[#FFD700] font-semibold rounded-xl hover:bg-gray-900 transition-all"
+                  >
+                    Browse Courses
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                  {enrolledCourses.map((course) => (
+                    <div
+                      key={course._id}
+                      className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-200 hover:border-[#FFD700] hover:shadow-2xl transition-all hover:scale-105 group"
+                    >
+                      {/* Course Thumbnail */}
+                      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                        {course.thumbnail ? (
+                          <img
+                            src={course.thumbnail}
+                            alt={course.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FaBook className="text-6xl text-gray-400" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                          {course.category || "Course"}
+                        </div>
+                      </div>
+
+                      {/* Course Info */}
+                      <div className="p-4">
+                        <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 min-h-[3rem]">
+                          {course.title || "Untitled Course"}
+                        </h3>
+                        {course.subTitle && (
+                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                            {course.subTitle}
+                          </p>
+                        )}
+                        
+                        {/* Course Details */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {course.class && (
+                            <span className="px-2 py-1 bg-[#FFD700] bg-opacity-20 text-[#FFD700] rounded-lg text-xs font-semibold">
+                              {course.class}
+                            </span>
+                          )}
+                          {course.subject && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold">
+                              {course.subject}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Action Button */}
+                        <button
+                          onClick={() => navigate(`/viewlecture/${course._id}`)}
+                          className="w-full bg-black text-[#FFD700] font-semibold py-2.5 rounded-xl hover:bg-gray-900 transition-all flex items-center justify-center gap-2 group"
+                        >
+                          <FaPlay className="text-sm group-hover:translate-x-1 transition-transform" />
+                          Continue Learning
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
           {activeTab === "notifications" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center mb-4">

@@ -25,6 +25,7 @@ import SearchWithAi from './pages/SearchWithAi'
 import StudentDashboard from './pages/StudentDashboard'
 import Assignments from './pages/admin/Assignments'
 import AdminUsers from './pages/admin/AdminUsers'
+import AdminPortal from './pages/admin/AdminPortal'
 import MyStudents from './pages/admin/MyStudents'
 import Attendance from './pages/admin/Attendance'
 import Notifications from './pages/admin/Notifications'
@@ -33,10 +34,26 @@ import Grades from './pages/admin/Grades'
 import Doubts from './pages/Doubts'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/admin/AdminFeedback'
+import VerifyCertificate from './pages/VerifyCertificate'
+import MyCertificates from './pages/MyCertificates'
 import AIAssistant from './components/AIAssistant'
+import axios from 'axios'
 
 // Use environment variable for server URL, fallback to localhost for development
-export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
+// If VITE_SERVER_URL is not set, use localhost backend for local development
+// export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
+export const serverUrl ="https://rajchemreactor.onrender.com"
+
+
+// Log server URL for debugging
+if (typeof window !== 'undefined') {
+    console.log("[App] Backend Server URL:", serverUrl);
+    console.log("[App] Environment:", import.meta.env.MODE);
+    console.log("[App] VITE_SERVER_URL:", import.meta.env.VITE_SERVER_URL || "Not set (using localhost:8000)");
+}
+
+// Configure axios defaults to always send credentials (cookies)
+axios.defaults.withCredentials = true;
 
 function App() {
   
@@ -84,7 +101,10 @@ function App() {
         <Route path='/doubts' element={userData?<Doubts/>:<Navigate to={"/signup"}/>}/>
         <Route path='/feedback' element={userData?.role === "student"?<Feedback/>:<Navigate to={"/signup"}/>}/>
         <Route path='/admin/users' element={userData?.role === "admin"?<AdminUsers/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/admin/portal' element={userData?.role === "admin"?<AdminPortal/>:<Navigate to={"/signup"}/>}/>
         <Route path='/admin/feedback' element={userData?.role === "admin"?<AdminFeedback/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/certificate/verify/:certificateId?' element={<VerifyCertificate/>}/>
+        <Route path='/my-certificates' element={userData?<MyCertificates/>:<Navigate to={"/signup"}/>}/>
         <Route path='/forgotpassword' element={<ForgotPassword/>}/>
          </Routes>
 

@@ -10,7 +10,10 @@ import {
   FaTimes,
   FaCheckCircle,
   FaClock,
-  FaBook
+  FaBook,
+  FaDownload,
+  FaReceipt,
+  FaFilter
 } from "react-icons/fa";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
@@ -18,17 +21,90 @@ const minutesToHours = (m = 0) => (m / 60).toFixed(1);
 
 function MyStudents() {
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [performanceData, setPerformanceData] = useState(null);
   const [loadingPerformance, setLoadingPerformance] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [statusFilter, setStatusFilter] = useState("all"); // all, success, failure, pending
+  const [downloadingReceipt, setDownloadingReceipt] = useState({});
 
   const fetchStudents = async () => {
     try {
       const res = await axios.get(`${serverUrl}/api/user/mystudents`, { withCredentials: true });
-      setStudents(res.data || []);
+      const studentsData = res.data || [];
+      setStudents(studentsData);
+      applyStatusFilter(studentsData, statusFilter);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to load students");
+    }
+  };
+
+  const applyStatusFilter = (studentsList, filter) => {
+    if (filter === "all") {
+      setFilteredStudents(studentsList);
+    } else {
+      setFilteredStudents(studentsList.filter(s => s.enrollmentStatus === filter));
+    }
+  };
+
+  useEffect(() => {
+    applyStatusFilter(students, statusFilter);
+  }, [statusFilter, students]);
+
+  const downloadReceipt = async (orderId, receiptId) => {
+    setDownloadingReceipt(prev => ({ ...prev, [orderId]: true }));
+    try {
+      const response = await axios.get(
+        `${serverUrl}/api/payment/receipt/generate/${orderId}`,
+        {
+          responseType: "blob",
+          withCredentials: true
+        }
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Receipt-${receiptId || orderId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Receipt downloaded successfully!");
+    } catch (error) {
+      console.error("Download receipt error:", error);
+      toast.error(error.response?.data?.message || "Failed to download receipt");
+    } finally {
+      setDownloadingReceipt(prev => ({ ...prev, [orderId]: false }));
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "success":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "failure":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "success":
+        return <FaCheckCircle className="text-green-600" />;
+      case "failure":
+        return <FaTimes className="text-red-600" />;
+      case "pending":
+        return <FaClock className="text-yellow-600" />;
+      default:
+        return <FaClock className="text-gray-600" />;
     }
   };
 

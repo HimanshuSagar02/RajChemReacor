@@ -8,6 +8,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { GiAchievement } from "react-icons/gi";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@uidotdev/usehooks";
+import { toast } from "react-toastify";
 
 function ViewLecture() {
   const { courseId } = useParams();
@@ -123,8 +124,30 @@ const generateQuiz = async () => {
               <p>You completed this course!</p>
 
               <button
-                onClick={() => window.open(`${serverUrl}/api/cert/generate/${userData._id}/${selectedCourse._id}`)}
-                className="bg-green-600 mt-4 text-white px-5 py-2 rounded-lg"
+                onClick={async () => {
+                  try {
+                    const response = await axios.get(
+                      `${serverUrl}/api/cert/generate/${selectedCourse._id}`,
+                      {
+                        responseType: "blob",
+                        withCredentials: true
+                      }
+                    );
+                    const blob = new Blob([response.data], { type: "application/pdf" });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `${selectedCourse.title}-certificate.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                  } catch (error) {
+                    console.error("Certificate download error:", error);
+                    toast.error(error.response?.data?.message || "Failed to download certificate");
+                  }
+                }}
+                className="bg-green-600 mt-4 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-all"
               >
                 Download Certificate
               </button>
@@ -192,9 +215,30 @@ const generateQuiz = async () => {
         {/* Certificate */}
        {progress === 100 && (
   <button
-    onClick={() =>
-      window.open(`${serverUrl}/api/cert/generate/${userData._id}/${selectedCourse._id}`)
-    }
+    onClick={async () => {
+      try {
+        const response = await axios.get(
+          `${serverUrl}/api/cert/generate/${selectedCourse._id}`,
+          {
+            responseType: "blob",
+            withCredentials: true
+          }
+        );
+        const blob = new Blob([response.data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${selectedCourse.title}-certificate.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        toast.success("Certificate downloaded successfully!");
+      } catch (error) {
+        console.error("Certificate download error:", error);
+        toast.error(error.response?.data?.message || "Failed to download certificate");
+      }
+    }}
     className="
       relative group mt-6 px-6 py-3 
       rounded-xl overflow-hidden
@@ -206,7 +250,7 @@ const generateQuiz = async () => {
   >
     {/* Watermark */}
     <span className="absolute inset-0 opacity-10 text-6xl font-bold flex justify-center items-center">
-      RCR
+RCR
     </span>
 
     {/* Button Content */}

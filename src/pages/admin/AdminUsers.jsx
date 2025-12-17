@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { serverUrl } from "../../App";
-import { FaUsers, FaCommentDots } from "react-icons/fa";
+import { FaUsers, FaCommentDots, FaCog } from "react-icons/fa";
 
 function AdminUsers() {
   const navigate = useNavigate();
@@ -109,12 +109,20 @@ function AdminUsers() {
             </h1>
             <p className="text-white">Manage all users, educators, and students</p>
           </div>
-          <button
-            onClick={() => navigate("/admin/feedback")}
-            className="px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center gap-2"
-          >
-            <FaCommentDots /> View Feedback
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/admin/portal")}
+              className="px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center gap-2"
+            >
+              <FaCog /> Portal Management
+            </button>
+            <button
+              onClick={() => navigate("/admin/feedback")}
+              className="px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center gap-2"
+            >
+              <FaCommentDots /> View Feedback
+            </button>
+          </div>
         </div>
         
         <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
