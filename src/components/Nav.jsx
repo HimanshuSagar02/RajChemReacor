@@ -120,52 +120,76 @@ function Nav() {
         </div>
       )}
 
-      {/* Mobile Menu Overlay */}
-      <div className={`fixed top-0 w-full h-full bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center gap-6 transition-transform duration-300 ${showHam ? "translate-x-0" : "translate-x-[-100%]"}`}>
-        <GiSplitCross
-          className='absolute top-6 right-6 w-10 h-10 fill-[#FFD700] cursor-pointer hover:fill-[#FFC107]'
-          onClick={() => setShowHam(prev => !prev)}
+     {/* Mobile Menu Overlay */}
+<div
+  className={`fixed inset-0 bg-black bg-opacity-95 z-[9999] flex flex-col items-center justify-center gap-6
+  transition-all duration-300
+  ${showHam ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"}
+`}
+>
+  {/* Close Button */}
+  <GiSplitCross
+    className="fixed top-6 right-6 w-10 h-10 fill-[#FFD700] cursor-pointer hover:fill-[#FFC107] z-[10000]"
+    onClick={() => setShowHam(false)}
+  />
+
+  {/* User Avatar */}
+  {!userData ? (
+    <IoMdPerson className="w-16 h-16 fill-[#FFD700] border-2 border-[#FFD700] rounded-full p-3" />
+  ) : (
+    <div className="w-16 h-16 rounded-full text-white flex items-center justify-center text-2xl font-bold border-2 border-[#FFD700] bg-black">
+      {userData.photoUrl ? (
+        <img
+          src={userData.photoUrl}
+          className="w-full h-full rounded-full object-cover"
+          alt=""
         />
+      ) : (
+        <span className="text-[#FFD700]">
+          {userData?.name?.slice(0, 1).toUpperCase()}
+        </span>
+      )}
+    </div>
+  )}
 
-        {!userData ? (
-          <IoMdPerson className='w-16 h-16 fill-[#FFD700] border-2 border-[#FFD700] rounded-full p-3' />
-        ) : (
-          <div className='w-16 h-16 rounded-full text-white flex items-center justify-center text-2xl font-bold border-2 border-[#FFD700] bg-black'>
-            {userData.photoUrl ? (
-              <img src={userData.photoUrl} className='w-full h-full rounded-full object-cover' alt="" />
-            ) : (
-              <span className='text-[#FFD700]'>{userData?.name?.slice(0, 1).toUpperCase()}</span>
-            )}
-          </div>
-        )}
+  {/* Menu Buttons */}
+  <div className="flex flex-col gap-4 w-full max-w-sm px-8">
+    {userData && (
+      <button
+        className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
+        onClick={() => {
+          navigate("/profile");
+          setShowHam(false);
+        }}
+      >
+        <IoMdPerson className="w-5 h-5" />
+        My Profile
+      </button>
+    )}
 
-        <div className='flex flex-col gap-4 w-full max-w-sm px-8'>
-          {userData && (
-            <button
-              className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2'
-              onClick={() => { navigate("/profile"); setShowHam(false); }}
-            >
-              <IoMdPerson className='w-5 h-5' />
-              My Profile
-            </button>
-          )}
-          {!userData ? (
-            <button
-              className='w-full px-6 py-4 border-2 border-[#FFD700] text-[#FFD700] font-bold rounded-xl hover:bg-[#FFD700] hover:text-black transition-all text-lg'
-              onClick={() => { navigate("/login"); setShowHam(false); }}
-            >
-              Login
-            </button>
-          ) : (
-            <button
-              className='w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg'
-              onClick={() => { handleLogout(); setShowHam(false); }}
-            >
-              Logout
-            </button>
-          )}
-        </div>
-      </div>
+    {!userData ? (
+      <button
+        className="w-full px-6 py-4 border-2 border-[#FFD700] text-[#FFD700] font-bold rounded-xl hover:bg-[#FFD700] hover:text-black transition-all text-lg"
+        onClick={() => {
+          navigate("/login");
+          setShowHam(false);
+        }}
+      >
+        Login
+      </button>
+    ) : (
+      <button
+        className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg"
+        onClick={() => {
+          handleLogout();
+          setShowHam(false);
+        }}
+      >
+        Logout
+      </button>
+    )}
+  </div>
+</div>
     </div>
   )
 }
