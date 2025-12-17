@@ -105,6 +105,23 @@ function Nav() {
         />
       </div>
 
+{userData && (
+  <button
+    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
+    onClick={() => {
+      navigate(
+        userData.role === "admin"
+          ? "/admin/dashboard"
+          : "/dashboard"
+      );
+      setShowHam(false);
+    }}
+  >
+    Dashboard
+  </button>
+)}
+
+
       {/* Profile Dropdown (Desktop) - Only My Profile */}
       {showPro && userData && (
         <div className='absolute top-[90px] right-4 lg:right-8 z-50 bg-white rounded-2xl shadow-2xl border-2 border-[#FFD700] p-4 min-w-[200px]'>
