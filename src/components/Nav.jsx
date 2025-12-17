@@ -105,22 +105,6 @@ function Nav() {
         />
       </div>
 
-{userData && (
-  <button
-    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
-    onClick={() => {
-      navigate(
-        userData.role === "admin"
-          ? "/admin/dashboard"
-          : "/dashboard"
-      );
-      setShowHam(false);
-    }}
-  >
-    Dashboard
-  </button>
-)}
-
 
       {/* Profile Dropdown (Desktop) - Only My Profile */}
       {showPro && userData && (
@@ -168,6 +152,20 @@ function Nav() {
       )}
     </div>
   )}
+
+{userData && (
+  <button
+    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
+    onClick={() => {
+      navigate("/dashboard");   // 👈 yahin dashboard route
+      setShowHam(false);
+    }}
+  >
+     <IoMdPerson className="w-5 h-5" />
+    Dashboard
+  </button>
+)}
+
 
   {/* Menu Buttons */}
   <div className="flex flex-col gap-4 w-full max-w-sm px-8">
