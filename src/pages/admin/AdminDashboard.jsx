@@ -29,8 +29,6 @@ import {
   FaDownload,
   FaSearch,
   FaChartBar,
-  FaTrendingUp,
-  FaTrendingDown,
   FaPercentage,
   FaUserCheck,
   FaUserTimes,
@@ -38,6 +36,10 @@ import {
   FaEye,
   FaEyeSlash
 } from "react-icons/fa";
+import {
+  FaArrowTrendUp,
+  FaArrowTrendDown
+} from "react-icons/fa6";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from "recharts";
 
 function AdminDashboard() {
