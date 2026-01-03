@@ -5,7 +5,7 @@ import axios from 'axios';
 const getServerUrl = () => {
   return import.meta.env.VITE_SERVER_URL || 
     (import.meta.env.MODE === 'production' 
-      ? "https://rajchemreactor.onrender.com" 
+      ? "https://rcr-backend.onrender.com" 
       : "http://localhost:8000");
 };
 
