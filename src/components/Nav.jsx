@@ -66,9 +66,9 @@ function Nav() {
           {userData?.role === "admin" && (
             <button
               className='px-6 py-2 bg-[#FFD700] text-black font-semibold rounded-xl hover:bg-[#FFC107] transition-all shadow-md'
-              onClick={() => navigate("/admin/users")}
+              onClick={() => navigate("/admin/dashboard")}
             >
-              Admin Panel
+              Admin Dashboard
             </button>
           )}
           {userData?.role === "student" && (
@@ -153,38 +153,82 @@ function Nav() {
     </div>
   )}
 
-{userData && (
+{userData?.role === "educator" && (
   <button
-    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
+    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
     onClick={() => {
-      navigate("/dashboard");   // 👈 yahin dashboard route
+      navigate("/dashboard");
       setShowHam(false);
     }}
   >
-     <IoMdPerson className="w-5 h-5" />
-    Dashboard
+    <FaTachometerAlt className="w-5 h-5" />
+    Educator Dashboard
+  </button>
+)}
+{userData?.role === "admin" && (
+  <button
+    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
+    onClick={() => {
+      navigate("/admin/dashboard");
+      setShowHam(false);
+    }}
+  >
+    <FaTachometerAlt className="w-5 h-5" />
+    Admin Dashboard
+  </button>
+)}
+{userData?.role === "student" && (
+  <button
+    className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
+    onClick={() => {
+      navigate("/student-dashboard");
+      setShowHam(false);
+    }}
+  >
+    <FaTachometerAlt className="w-5 h-5" />
+    Student Dashboard
   </button>
 )}
 
 
   {/* Menu Buttons */}
-  <div className="flex flex-col gap-4 w-full max-w-sm px-8">
+  <div className="flex flex-col gap-3 w-full max-w-sm px-6">
     {userData && (
-      <button
-        className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2"
-        onClick={() => {
-          navigate("/profile");
-          setShowHam(false);
-        }}
-      >
-        <IoMdPerson className="w-5 h-5" />
-        My Profile
-      </button>
+      <>
+        <button
+          className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
+          onClick={() => {
+            navigate("/allcourses");
+            setShowHam(false);
+          }}
+        >
+          All Courses
+        </button>
+        <button
+          className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
+          onClick={() => {
+            navigate("/enrolledcourses");
+            setShowHam(false);
+          }}
+        >
+          My Courses
+        </button>
+        <button
+          className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all text-lg flex items-center justify-center gap-2 min-h-[48px]"
+          onClick={() => {
+            navigate("/profile");
+            setShowHam(false);
+          }}
+        >
+          <IoMdPerson className="w-5 h-5" />
+          My Profile
+        </button>
+      </>
     )}
 
     {!userData ? (
       <button
-        className="w-full px-6 py-4 border-2 border-[#FFD700] text-[#FFD700] font-bold rounded-xl hover:bg-[#FFD700] hover:text-black transition-all text-lg"
+        className="w-full px-6 py-4 border-2 border-[#FFD700] text-[#FFD700] font-bold rounded-xl active:bg-[#FFD700] active:text-black transition-all text-lg min-h-[48px]"
         onClick={() => {
           navigate("/login");
           setShowHam(false);
@@ -194,7 +238,7 @@ function Nav() {
       </button>
     ) : (
       <button
-        className="w-full px-6 py-4 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all text-lg"
+        className="w-full px-6 py-4 bg-red-600 text-white font-bold rounded-xl active:bg-red-700 transition-all text-lg min-h-[48px]"
         onClick={() => {
           handleLogout();
           setShowHam(false);

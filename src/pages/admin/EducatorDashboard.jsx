@@ -45,8 +45,24 @@ function EducatorDashboard() {
       );
     }
 
-    if (userData.role !== "educator" && userData.role !== "admin") {
+    if (userData.role !== "educator") {
       console.log("User role check failed", userData.role);
+      if (userData.role === "admin") {
+        return (
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-gray-600 text-lg mb-2">This is the Educator Dashboard.</p>
+              <p className="text-gray-500 mb-4">Admins should use the Admin Dashboard.</p>
+              <button 
+                onClick={() => navigate("/admin/dashboard")}
+                className="mt-4 px-4 py-2 bg-[#FFD700] text-black rounded-lg hover:bg-[#FFC107] font-semibold"
+              >
+                Go to Admin Dashboard
+              </button>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">

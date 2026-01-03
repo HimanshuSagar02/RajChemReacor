@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import Dashboard from './pages/admin/Dashboard'
 import EducatorDashboard from './pages/admin/EducatorDashboard'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import Courses from './pages/admin/Courses'
 import AllCouses from './pages/AllCouses'
 import AddCourses from './pages/admin/AddCourses'
@@ -41,8 +42,11 @@ import axios from 'axios'
 
 // Use environment variable for server URL, fallback to localhost for development
 // If VITE_SERVER_URL is not set, use localhost backend for local development
-// export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
-export const serverUrl ="https://rajchemreactor.onrender.com"
+// Use environment variable for server URL, with fallbacks
+export const serverUrl = import.meta.env.VITE_SERVER_URL || 
+  (import.meta.env.MODE === 'production' 
+    ? "https://rajchemreactor.onrender.com" 
+    : "http://localhost:8000")
 
 
 // Log server URL for debugging
@@ -80,26 +84,29 @@ function App() {
         
         
         <Route path='/dashboard' element={
-          userData?.role === "educator" || userData?.role === "admin" 
-            ? <EducatorDashboard/> 
-            : userData 
-              ? <Navigate to={"/student-dashboard"}/> 
-              : <Navigate to={"/signup"}/>
+          userData?.role === "admin"
+            ? <AdminDashboard/>
+            : userData?.role === "educator"
+              ? <EducatorDashboard/>
+              : userData 
+                ? <Navigate to={"/student-dashboard"}/> 
+                : <Navigate to={"/signup"}/>
         }/>
         <Route path='/dashboard-old' element={userData?.role === "educator"?<Dashboard/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/courses' element={userData?.role === "educator"?<Courses/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/addcourses/:courseId' element={userData?.role === "educator"?<AddCourses/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/createcourses' element={userData?.role === "educator"?<CreateCourse/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/createlecture/:courseId' element={userData?.role === "educator"?<CreateLecture/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/editlecture/:courseId/:lectureId' element={userData?.role === "educator"?<EditLecture/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/assignments' element={userData?.role === "educator"?<Assignments/>:<Navigate to={"/signup"}/>}/>
-        <Route path='/my-students' element={userData?.role === "educator"?<MyStudents/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/courses' element={(userData?.role === "educator" || userData?.role === "admin")?<Courses/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/addcourses/:courseId' element={(userData?.role === "educator" || userData?.role === "admin")?<AddCourses/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/createcourses' element={(userData?.role === "educator" || userData?.role === "admin")?<CreateCourse/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/createlecture/:courseId' element={(userData?.role === "educator" || userData?.role === "admin")?<CreateLecture/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/editlecture/:courseId/:lectureId' element={(userData?.role === "educator" || userData?.role === "admin")?<EditLecture/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/assignments' element={(userData?.role === "educator" || userData?.role === "admin")?<Assignments/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/my-students' element={(userData?.role === "educator" || userData?.role === "admin")?<MyStudents/>:<Navigate to={"/signup"}/>}/>
         <Route path='/attendance' element={(userData?.role === "educator" || userData?.role==="admin")?<Attendance/>:<Navigate to={"/signup"}/>}/>
         <Route path='/notifications' element={(userData?.role === "educator" || userData?.role==="admin")?<Notifications/>:<Navigate to={"/signup"}/>}/>
         <Route path='/liveclasses' element={(userData?.role === "educator" || userData?.role==="admin")?<LiveClasses/>:<Navigate to={"/signup"}/>}/>
         <Route path='/grades' element={(userData?.role === "educator" || userData?.role==="admin")?<Grades/>:<Navigate to={"/signup"}/>}/>
         <Route path='/doubts' element={userData?<Doubts/>:<Navigate to={"/signup"}/>}/>
         <Route path='/feedback' element={userData?.role === "student"?<Feedback/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/admin/dashboard' element={userData?.role === "admin"?<AdminDashboard/>:<Navigate to={"/signup"}/>}/>
         <Route path='/admin/users' element={userData?.role === "admin"?<AdminUsers/>:<Navigate to={"/signup"}/>}/>
         <Route path='/admin/portal' element={userData?.role === "admin"?<AdminPortal/>:<Navigate to={"/signup"}/>}/>
         <Route path='/admin/feedback' element={userData?.role === "admin"?<AdminFeedback/>:<Navigate to={"/signup"}/>}/>

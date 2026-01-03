@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { serverUrl } from "../../App";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { 
   FaUsers, 
   FaBook, 
@@ -17,11 +19,14 @@ import {
   FaCheckCircle,
   FaTimesCircle,
   FaClock,
-  FaFilter
+  FaFilter,
+  FaGraduationCap
 } from "react-icons/fa";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 function AdminPortal() {
+  const navigate = useNavigate();
+  const { userData } = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(false);
   const [portalStats, setPortalStats] = useState(null);
@@ -29,6 +34,14 @@ function AdminPortal() {
   const [problems, setProblems] = useState([]);
   const [sectionFilter, setSectionFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("7d"); // 7d, 30d, all
+
+  // Check if user is admin
+  useEffect(() => {
+    if (userData && userData.role !== "admin") {
+      toast.error("Access denied. Admin access required.");
+      navigate("/");
+    }
+  }, [userData, navigate]);
 
   // Fetch portal statistics
   const fetchPortalStats = async () => {
@@ -93,6 +106,13 @@ function AdminPortal() {
     }
   }, [activeTab, sectionFilter, dateFilter]);
 
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchPortalStats();
+    fetchActivities();
+    fetchProblems();
+  }, []);
+
   const sections = [
     { value: "all", label: "All Sections" },
     { value: "authentication", label: "Authentication" },
@@ -138,11 +158,38 @@ function AdminPortal() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-6 mb-6 border-2 border-[#FFD700]">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#FFD700] mb-2 flex items-center gap-3">
-            <FaCog className="text-4xl" />
-            Admin Portal Management
-          </h1>
-          <p className="text-white text-sm md:text-base">Complete portal overview, activity monitoring, and problem tracking</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#FFD700] mb-2 flex items-center gap-3">
+                <FaCog className="text-4xl" />
+                Admin Portal Management
+              </h1>
+              <p className="text-white text-sm md:text-base">Complete portal overview, activity monitoring, and problem tracking</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => navigate("/admin/users")}
+                className="px-4 py-2 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-[#FFC107] transition-all text-sm flex items-center gap-2"
+              >
+                <FaUsers />
+                Manage Users
+              </button>
+              <button
+                onClick={() => navigate("/admin/feedback")}
+                className="px-4 py-2 bg-[#FFD700] text-black font-semibold rounded-lg hover:bg-[#FFC107] transition-all text-sm flex items-center gap-2"
+              >
+                <FaBell />
+                View Feedback
+              </button>
+              <button
+                onClick={() => navigate("/liveclasses")}
+                className="px-4 py-2 bg-black text-[#FFD700] font-semibold rounded-lg hover:bg-gray-900 transition-all text-sm border border-[#FFD700] flex items-center gap-2"
+              >
+                <FaVideo />
+                Live Classes
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}

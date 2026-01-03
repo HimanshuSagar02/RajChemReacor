@@ -3,6 +3,146 @@
 
 *{
    font-family: Outfit;
-   
+}
+
+/* Mobile Responsive Improvements */
+/* Ensure touch-friendly buttons (minimum 44x44px) */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Prevent text size adjustment on iOS */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Mobile-friendly tables */
+@media (max-width: 768px) {
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  thead {
+    display: none;
+  }
+  
+  tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background: white;
+  }
+  
+  td {
+    display: block;
+    text-align: right;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  td:before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  
+  td:last-child {
+    border-bottom: none;
+  }
+}
+
+/* Improve form inputs on mobile */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Improve modal/dialog on mobile */
+@media (max-width: 768px) {
+  [role="dialog"],
+  .modal {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 1rem auto !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Better spacing on mobile */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Improve card layouts on mobile */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Touch-friendly icons and interactive elements */
+@media (max-width: 768px) {
+  svg, i, [class*="icon"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+
+/* Improve video player on mobile */
+@media (max-width: 768px) {
+  video {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+  }
+}
+
+/* Better dropdowns on mobile */
+@media (max-width: 768px) {
+  select {
+    padding: 12px 40px 12px 12px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
 }
 

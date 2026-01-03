@@ -99,38 +99,38 @@ function AdminUsers() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-8 pt-20 sm:pt-24">
       <div className="max-w-6xl mx-auto">
         {/* Header with Feedback Link */}
-        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-6 mb-6 border-2 border-[#FFD700] flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-[#FFD700] mb-2 flex items-center gap-3">
-              <FaUsers /> User Management
+        <div className="bg-gradient-to-r from-black via-gray-900 to-black rounded-2xl shadow-2xl p-4 sm:p-6 mb-4 sm:mb-6 border-2 border-[#FFD700] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#FFD700] mb-2 flex items-center gap-2 sm:gap-3">
+              <FaUsers className="text-xl sm:text-2xl" /> <span>User Management</span>
             </h1>
-            <p className="text-white">Manage all users, educators, and students</p>
+            <p className="text-white text-sm sm:text-base">Manage all users, educators, and students</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={() => navigate("/admin/portal")}
-              className="px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center gap-2"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
             >
-              <FaCog /> Portal Management
+              <FaCog /> <span className="hidden sm:inline">Portal</span> <span className="sm:hidden">Portal</span>
             </button>
             <button
               onClick={() => navigate("/admin/feedback")}
-              className="px-6 py-3 bg-[#FFD700] text-black font-bold rounded-xl hover:bg-[#FFC107] transition-all shadow-lg flex items-center gap-2"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-[#FFD700] text-black font-bold rounded-xl active:bg-[#FFC107] transition-all shadow-lg flex items-center justify-center gap-2 text-sm sm:text-base min-h-[44px]"
             >
-              <FaCommentDots /> View Feedback
+              <FaCommentDots /> <span className="hidden sm:inline">Feedback</span> <span className="sm:hidden">Feedback</span>
             </button>
           </div>
         </div>
         
-        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">Users List</h2>
-            <div className="flex gap-2">
+        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-lg sm:text-xl font-bold">Users List</h2>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               <select
-                className="border rounded p-2 text-sm text-black"
+                className="border-2 border-gray-300 rounded-lg p-3 text-sm sm:text-base text-black w-full sm:w-auto min-h-[44px] focus:outline-none focus:border-[#FFD700]"
                 value={filters.role}
                 onChange={(e) => setFilters((p) => ({ ...p, role: e.target.value }))}
               >
@@ -140,7 +140,7 @@ function AdminUsers() {
                 <option value="admin">Admin</option>
               </select>
               <select
-                className="border rounded p-2 text-sm text-black"
+                className="border-2 border-gray-300 rounded-lg p-3 text-sm sm:text-base text-black w-full sm:w-auto min-h-[44px] focus:outline-none focus:border-[#FFD700]"
                 value={filters.status}
                 onChange={(e) => setFilters((p) => ({ ...p, status: e.target.value }))}
               >
@@ -153,30 +153,31 @@ function AdminUsers() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <h2 className="font-semibold">Create User</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-3 sm:space-y-4">
+            <h2 className="font-semibold text-lg sm:text-xl">Create User</h2>
             <input
-              className="w-full border rounded p-2 text-black"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 text-black text-base focus:outline-none focus:border-[#FFD700] min-h-[44px]"
               placeholder="Name"
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
             />
             <input
-              className="w-full border rounded p-2 text-black"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 text-black text-base focus:outline-none focus:border-[#FFD700] min-h-[44px]"
               placeholder="Email"
+              type="email"
               value={form.email}
               onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
             />
             <input
-              className="w-full border rounded p-2 text-black"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 text-black text-base focus:outline-none focus:border-[#FFD700] min-h-[44px]"
               placeholder="Password"
               type="password"
               value={form.password}
               onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
             />
             <select
-              className="w-full border rounded p-2 text-black"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 text-black text-base focus:outline-none focus:border-[#FFD700] min-h-[44px]"
               value={form.role}
               onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))}
             >
@@ -185,7 +186,7 @@ function AdminUsers() {
               <option value="admin">Admin</option>
             </select>
             <select
-              className="w-full border rounded p-2 text-black"
+              className="w-full border-2 border-gray-300 rounded-lg p-3 text-black text-base focus:outline-none focus:border-[#FFD700] min-h-[44px]"
               value={form.status}
               onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))}
             >
@@ -193,22 +194,25 @@ function AdminUsers() {
               <option value="pending">Pending</option>
               <option value="rejected">Rejected</option>
             </select>
-            <button onClick={createUser} className="px-4 py-2 bg-black text-white rounded-lg">
-              Create
+            <button 
+              onClick={createUser} 
+              className="w-full px-4 py-3 bg-black text-white rounded-lg font-semibold active:bg-gray-800 transition-all min-h-[44px]"
+            >
+              Create User
             </button>
           </div>
 
-          <div className="space-y-3">
-            <h2 className="font-semibold">Users</h2>
-            <div className="max-h-[520px] overflow-y-auto space-y-2">
+          <div className="space-y-3 sm:space-y-4">
+            <h2 className="font-semibold text-lg sm:text-xl">Users ({users.length})</h2>
+            <div className="max-h-[520px] overflow-y-auto space-y-2 sm:space-y-3">
               {users.map((u) => (
-                <div key={u._id} className="border rounded-lg p-3 shadow-sm">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <p className="font-semibold">{u.name}</p>
-                      <p className="text-sm text-gray-600">{u.email}</p>
-                      <p className="text-xs text-gray-500">
-                        Role: {u.role} • Status: {u.status}
+                <div key={u._id} className="border-2 border-gray-200 rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                    <div className="flex-1 w-full">
+                      <p className="font-semibold text-base sm:text-lg">{u.name}</p>
+                      <p className="text-sm sm:text-base text-gray-600 break-words">{u.email}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                        Role: <span className="font-semibold">{u.role}</span> • Status: <span className="font-semibold">{u.status}</span>
                       </p>
                       
                       {/* Password Update Section */}
@@ -216,7 +220,7 @@ function AdminUsers() {
                         <div className="mt-3 space-y-2">
                           <input
                             type="password"
-                            className="w-full border rounded p-2 text-sm text-black"
+                            className="w-full border-2 border-gray-300 rounded-lg p-3 text-base text-black focus:outline-none focus:border-[#FFD700] min-h-[44px]"
                             placeholder="New password (min 8 chars)"
                             value={passwordUpdates[u._id] || ""}
                             onChange={(e) =>
@@ -228,13 +232,13 @@ function AdminUsers() {
                           />
                           <div className="flex gap-2">
                             <button
-                              className="px-3 py-1 bg-green-600 text-white text-sm rounded"
+                              className="flex-1 px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg active:bg-green-700 transition-all min-h-[44px] font-semibold"
                               onClick={() => updatePassword(u._id)}
                             >
                               Save
                             </button>
                             <button
-                              className="px-3 py-1 bg-gray-300 text-black text-sm rounded"
+                              className="flex-1 px-4 py-2 bg-gray-300 text-black text-sm sm:text-base rounded-lg active:bg-gray-400 transition-all min-h-[44px] font-semibold"
                               onClick={() => {
                                 setEditingPassword(null);
                                 setPasswordUpdates((prev) => {
@@ -250,34 +254,32 @@ function AdminUsers() {
                         </div>
                       ) : (
                         <button
-                          className="mt-2 text-xs text-blue-600 hover:underline"
+                          className="mt-2 text-sm sm:text-base text-blue-600 hover:underline active:text-blue-800 min-h-[44px] px-2 py-1"
                           onClick={() => setEditingPassword(u._id)}
                         >
                           🔑 Update Password
                         </button>
                       )}
                     </div>
-                    <div className="flex flex-col gap-2 text-sm">
-                      <div className="flex gap-2">
-                        <button
-                          className="text-green-600 hover:bg-green-50 px-2 py-1 rounded"
-                          onClick={() => updateStatus(u._id, "approved")}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          className="text-orange-600 hover:bg-orange-50 px-2 py-1 rounded"
-                          onClick={() => updateStatus(u._id, "pending")}
-                        >
-                          Pending
-                        </button>
-                        <button
-                          className="text-red-600 hover:bg-red-50 px-2 py-1 rounded"
-                          onClick={() => updateStatus(u._id, "rejected")}
-                        >
-                          Reject
-                        </button>
-                      </div>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-3 sm:mt-0">
+                      <button
+                        className="flex-1 sm:flex-none px-4 py-2 bg-green-600 text-white text-sm sm:text-base rounded-lg active:bg-green-700 transition-all min-h-[44px] font-semibold"
+                        onClick={() => updateStatus(u._id, "approved")}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="flex-1 sm:flex-none px-4 py-2 bg-orange-600 text-white text-sm sm:text-base rounded-lg active:bg-orange-700 transition-all min-h-[44px] font-semibold"
+                        onClick={() => updateStatus(u._id, "pending")}
+                      >
+                        Pending
+                      </button>
+                      <button
+                        className="flex-1 sm:flex-none px-4 py-2 bg-red-600 text-white text-sm sm:text-base rounded-lg active:bg-red-700 transition-all min-h-[44px] font-semibold"
+                        onClick={() => updateStatus(u._id, "rejected")}
+                      >
+                        Reject
+                      </button>
                     </div>
                   </div>
                 </div>
