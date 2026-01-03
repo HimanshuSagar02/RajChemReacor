@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaWifi, FaWifiSlash } from 'react-icons/fa';
+import { FaWifi } from "react-icons/fa";
+import { FaWifiSlash } from "react-icons/fa6";
 import axios from 'axios';
 
 const getServerUrl = () => {
