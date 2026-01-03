@@ -34,8 +34,8 @@ function Login() {
 
         setLoading(true)
         try {
-            // Use serverUrl from App.jsx (which uses VITE_SERVER_URL or defaults to localhost)
-            const result = await axios.post(`${serverUrl}/api/auth/login`, {email, password}, {withCredentials: true})
+            // Use axiosInstance for better error handling
+            const result = await axiosInstance.post('/api/auth/login', {email, password})
             
             if (result.data && result.data._id) {
                 console.log("[Login] Login successful, user data:", result.data);
@@ -111,7 +111,7 @@ function Login() {
             }
             
             console.log("[GoogleLogin] Sending user data to backend...");
-            const result = await axios.post(serverUrl + "/api/auth/googlesignup", {
+            const result = await axiosInstance.post("/api/auth/googlesignup", {
                 name, 
                 email, 
                 photoUrl

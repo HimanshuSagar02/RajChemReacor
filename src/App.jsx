@@ -19,6 +19,7 @@ import CreateLecture from './pages/admin/CreateLecture'
 import EditLecture from './pages/admin/EditLecture'
 import ViewCourse from './pages/ViewCourse'
 import ScrollToTop from './components/ScrollToTop'
+import ConnectionStatus from './components/ConnectionStatus'
 import DataLoader from './components/DataLoader'
 import EnrolledCourse from './pages/EnrolledCourse'
 import ViewLecture from './pages/ViewLecture'
@@ -58,6 +59,22 @@ if (typeof window !== 'undefined') {
 
 // Configure axios defaults to always send credentials (cookies)
 axios.defaults.withCredentials = true;
+axios.defaults.timeout = 30000; // 30 seconds timeout
+
+// Add global error handler for network connectivity
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    console.log('[App] Internet connection restored');
+    const { toast } = require('react-toastify');
+    toast.success('Internet connection restored');
+  });
+
+  window.addEventListener('offline', () => {
+    console.warn('[App] Internet connection lost');
+    const { toast } = require('react-toastify');
+    toast.error('Internet connection lost. Please check your network.');
+  });
+}
 
 function App() {
   
@@ -68,6 +85,7 @@ function App() {
       <DataLoader />
       <ToastContainer />
       <ScrollToTop/>
+      <ConnectionStatus />
       {userData && <AIAssistant />}
       <Routes>
         <Route path='/' element={<Home/>}/>
