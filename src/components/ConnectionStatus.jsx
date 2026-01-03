@@ -76,7 +76,7 @@ function ConnectionStatus() {
     <div className="fixed bottom-4 right-4 z-50 bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-pulse">
       {!isOnline ? (
         <>
-          <FaWifiSlash className="text-xl" />
+          <FaWifiXmark className="text-xl" />
           <span className="text-sm font-semibold">No Internet Connection</span>
         </>
       ) : checking ? (
@@ -86,7 +86,7 @@ function ConnectionStatus() {
         </>
       ) : (
         <>
-          <FaWifiSlash className="text-xl" />
+          <FaWifiXmark className="text-xl" />
           <span className="text-sm font-semibold">Cannot connect to server</span>
         </>
       )}
