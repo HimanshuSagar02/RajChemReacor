@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { FaWifi } from "react-icons/fa";
-import { FaWifiSlash } from "react-icons/fa6";
-import axios from 'axios';
+import { FaWifiXmark } from "react-icons/fa6";
+import axios from "axios";
 
 const getServerUrl = () => {
   return import.meta.env.VITE_SERVER_URL || 
